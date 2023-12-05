@@ -75,8 +75,12 @@ WSGI_APPLICATION = 'rechrchartc.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'WalrFDdofcpmeZ26',
+        'HOST': 'db.iiwzcaocnyayvtgyyfcg.supabase.co',
+        'PORT': '5432',
     }
 }
 
