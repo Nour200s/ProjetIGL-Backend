@@ -1,6 +1,7 @@
 from django.urls import path 
-from rest_framework.routers import DefaultRouter
-from .views import UserviewSet
+from ..views import Registerview , Loginview
 
-post_router = DefaultRouter()
-post_router.register(r'rchrchArtcl', UserviewSet)
+urlpatterns = [
+    path('register',Registerview.as_view()) ,
+    path('login',Loginview.as_view())
+]
