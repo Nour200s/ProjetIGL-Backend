@@ -1,13 +1,14 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 class Admins(models.Model):
      id = models.BigAutoField(primary_key=True)
-     name = models.CharField(max_length=255)
+     name = models.CharField(max_length=255,unique=True)
      password = models.CharField(max_length=255)
 
 class Moderateurs(models.Model):
      id = models.BigAutoField(primary_key=True)
-     name = models.CharField(max_length=255)
+     name = models.CharField(max_length=255,unique=True)
      password = models.CharField(max_length=255)
 
 class Article(models.Model):
@@ -17,11 +18,15 @@ class Article(models.Model):
      contenu = models.TextField()
      pdf = models.TextField()
 
-class User(models.Model):
+class User(AbstractUser):
      id = models.BigAutoField(primary_key=True)
-     name = models.CharField(max_length=255)
+     name = models.CharField(max_length=255, unique=True)
      password = models.CharField(max_length=255)
      favoris = models.ManyToManyField(Article)
+     username = None 
+     last_login = None 
+     REQUIRED_FIELDS = []
+     USERNAME_FIELD = "name"
 
 class Institution(models.Model):
      id = models.BigAutoField(primary_key=True)
