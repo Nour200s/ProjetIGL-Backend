@@ -4,6 +4,9 @@ from .api.serializers import UserSerializer
 from rest_framework.response import Response 
 from .models import User ,Moderateurs, Admins  
 import jwt , datetime  
+from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView,UpdateView,DeleteView
+from django.urls import reverse_lazy
 
 class Registerview(APIView):
     def post(self , request): 
@@ -49,3 +52,25 @@ class Loginview(APIView):
         }
         reponse.set_cookie("SESSION",value=token) 
         return reponse 
+    
+
+class ModeratorList(ListView):
+    model = Moderateurs
+    context_object_name = 'Moderateurs'
+    template_name = 'rchrchArtcl/mod-list.html'
+
+
+class ModeratorCreate(CreateView):
+    model = Moderateurs
+    fields = '__all__'
+    success_url = reverse_lazy('adminpage')
+
+class ModeratorEdit(UpdateView):
+    model = Moderateurs
+    fields = '__all__'
+    success_url = reverse_lazy('adminpage')
+
+class ModeratorDelete(DeleteView):
+    model = Moderateurs
+    context_object_name = 'mod'
+    success_url = reverse_lazy('adminpage')
