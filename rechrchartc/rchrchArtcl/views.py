@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from rest_framework.views import APIView 
-from .api.serializers import UserSerializer 
+from .api.serializers import UserSerializer ,ModerateursSerializer
 from rest_framework.response import Response 
-from .models import User ,Moderateurs, Admins  
+from .models import User ,Moderateurs, Admins
 import jwt , datetime  
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
+
+import PyPDF2
 
 class Registerview(APIView):
     def post(self , request): 
@@ -54,23 +56,61 @@ class Loginview(APIView):
         return reponse 
     
 
-class ModeratorList(ListView):
-    model = Moderateurs
-    context_object_name = 'Moderateurs'
-    template_name = 'rchrchArtcl/mod-list.html'
+class ModeratorList(APIView):
+    def get(self,request):
+        mods = Moderateurs.objects.all()
+        serializer = ModerateursSerializer(mods,many=True)
 
 
-class ModeratorCreate(CreateView):
-    model = Moderateurs
-    fields = '__all__'
-    success_url = reverse_lazy('adminpage')
+        return Response(serializer.data)
+    
+class ModeratorUpdate(APIView):
+    def get(self,request,pk):
+        mods = Moderateurs.objects.get(id=pk)
+        serializer = ModerateursSerializer(mods,many=False)
+        return Response(serializer.data)
+    def put(self,request,pk):
+        data = request.data
+        mod = Moderateurs.objects.get(id=pk)
+        serializer = ModerateursSerializer(instance=mod ,data=data)
 
-class ModeratorEdit(UpdateView):
-    model = Moderateurs
-    fields = '__all__'
-    success_url = reverse_lazy('adminpage')
+        if serializer.is_valid():
+            serializer.save() 
+        return Response(serializer.data)
+    def delete(self,request,pk):
+        mod = Moderateurs.objects.get(id=pk)
+        mod.delete()
+        return Response("Moderateur supprimé")
+    def post(self,request):
 
-class ModeratorDelete(DeleteView):
-    model = Moderateurs
-    context_object_name = 'mod'
-    success_url = reverse_lazy('adminpage')
+        user = User.objects.filter(name=request.data["name"]).first()
+        moderateur = Moderateurs.objects.filter(name=request.data["name"]).first()
+        admin = Admins.objects.filter(name=request.data["name"]).first()
+        if user is None and moderateur is None and admin is None :
+            newmod = Moderateurs.objects.create(
+                name = request.data["name"],
+                password = request.data["password"]
+            )
+            serializer = ModerateursSerializer(newmod ,many=False)
+            return Response(serializer)
+        else:
+            return Response({
+                "ERROR" : "Not valid"
+            })
+
+
+class ArticleAdd(APIView):
+    def extractText(pdf_file : str) -> [str] :
+        with open(pdf_file , 'rb') as pdf:
+            reader = PyPDF2.PdfFileReader(pdf ,strict=False)
+            pdf_text = []
+            for page in reader.pages:
+                content = page.extract_text()
+                pdf_text.append(content)
+            return pdf_text
+
+
+    def post(self,request):
+        pdf = request.data[""]
+
+        return Response("Article ajoutée")
