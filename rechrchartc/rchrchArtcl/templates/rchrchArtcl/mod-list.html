@@ -1,0 +1,16 @@
+<h2>Moderator List</h2>
+<h4><a href="{% url 'createmod' %}"> Add Mod</a></h4>
+<table>
+    <tr>
+        <th>Moderateurs</th>
+    </tr>
+        {% for moderator in Moderateurs %}
+        <tr>
+            <td>{{moderator.name}} </td>
+            <td><a href="{% url 'editmod' moderator.id %}">Edit</a></td>
+            <td><a href="{% url 'deletemod' moderator.id %}">Delete</a></td>
+        </tr>
+        {% empty %}
+        <h3>No items in list</h3>
+        {% endfor %}
+</table>

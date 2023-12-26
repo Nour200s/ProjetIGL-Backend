@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     'rchrchArtcl',
 
 ]
-CALL_ALLOWED_ORIGINS = [ 'http://192.168.56.1:3000' ]
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -132,10 +132,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'rchrchArtcl.User'
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL = True
-
-AUTHENTICATION_BACKENDS  = (
-    'django.contrib.auth.backends.ModelBackend' , 
-    'allauth.account.auth_backends.AuthenticationBackend' , 
-)
-SITE_ID = 1 
+CORS_ALLOW_ALL_ORIGINS = True

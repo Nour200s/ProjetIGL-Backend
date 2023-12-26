@@ -17,7 +17,13 @@ class Article(models.Model):
      resume = models.TextField()
      contenu = models.TextField()
      pdf = models.TextField()
+     date_pub = models.DateField(auto_now_add=True)
 
+class Mot_cle(models.Model):
+     mot = models.TextField()
+     article = models.ForeignKey(Article ,on_delete=models.CASCADE)
+
+     
 class User(AbstractUser):
      id = models.BigAutoField(primary_key=True)
      name = models.CharField(max_length=255, unique=True)
