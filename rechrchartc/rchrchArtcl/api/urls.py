@@ -7,5 +7,7 @@ urlpatterns = [
     path('mods/',ModeratorList.as_view(),name="mods"),
     path('mods/new',ModeratorUpdate.as_view(),name="modcreate"),
     path('mods/<str:pk>',ModeratorUpdate.as_view(),name="modupdate"),
-    path('mods/<str:pk>/delete',ModeratorUpdate.as_view(),name="moddelete")
+    path('mods/<str:pk>/delete',ModeratorUpdate.as_view(),name="moddelete"),
+    path('article/',ArticleViewset.as_view()),
+    path('article/<int:id>',ArticleViewset.as_view())
 ]

@@ -19,7 +19,8 @@ from django.urls import path , include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('rchrchArtcl.api.urls'))
+    path('api/', include('rchrchArtcl.api.urls')),
+    path('apiArticle/', include('rchrchArtcl.api.urls'))
 ]
 '''path('adminpage/',ModeratorList.as_view(),name='adminpage'),
     path('createmod/', ModeratorCreate.as_view(),name='createmod'),

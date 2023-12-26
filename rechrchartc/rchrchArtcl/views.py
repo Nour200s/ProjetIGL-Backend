@@ -1,14 +1,17 @@
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView 
-from .api.serializers import UserSerializer ,ModerateursSerializer
+from .api.serializers import UserSerializer ,ModerateursSerializer,InstitutionSerializer,AuteursSerializer,MotCleSerializer,ReferencesSerializer,ArticleSerializer
 from rest_framework.response import Response 
-from .models import User ,Moderateurs, Admins
+from .models import User ,Moderateurs, Admins,Institution,Article,Mot_cle,References,Auteurs
 import jwt , datetime  
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
-
+from rest_framework import status
+from .api import serializers
 import PyPDF2
+from . import models
 
 class Registerview(APIView):
     def post(self , request): 
@@ -114,3 +117,70 @@ class ArticleAdd(APIView):
         pdf = request.data[""]
 
         return Response("Article ajoutée")
+    
+
+class ArticleViewset(APIView):
+    def get(self,request,id=None):
+        if id:
+            item = models.Article.objects.get(id=id)
+            serializer = serializers.ArticleSerializer(item)
+            return Response({"status":"success","data":serializer.data},status=status.HTTP_200_OK)
+        items=models.Article.objects.all()
+        serializer = serializers.ArticleSerializer(items,many=True)
+        return Response({"status":"success","data":serializer.data},status=status.HTTP_200_OK)
+    
+
+    # Post 
+    def post (self,request):
+        serializer = ArticleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status":"success","data":serializer.data},status=status.HTTP_200_OK)
+        else:
+            return Response({"status":"error","data":serializer.error},status=status.HTTP_400_BAD_REQUEST)
+        
+    # Patch
+   
+
+    def patch(self, request, id=None):
+        try:
+            article_instance = models.Article.objects.get(id=id)
+        except models.Article.DoesNotExist:
+            return Response({"status": "error", "message": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = serializers.ArticleSerializer(article_instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+        return Response({"status": "error", "data": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    #Delete 
+    def delete(self,request,id):
+        try:
+            obj=Article.objects.get(id=id)
+        except Article.DoesNotExist:
+            msg={"msg" : "Article not found"}
+            return Response(msg,status=status.HTTP_404_NOT_FOUND)
+        obj.delete()  
+        return Response({"status":"success","data":"item Deleted" })           
+    
+
+    def patch_references(self, request, id=None):
+        try:
+            article_instance = models.Article.objects.get(id=id)
+        except models.Article.DoesNotExist:
+            return Response({"status": "error", "message": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        references_data = request.data.get('references', {})  # Assuming references are in the request payload
+
+        serializer = serializers.ReferencesSerializer(
+            instance=article_instance.references,
+            data=references_data,
+            partial=True
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+        return Response({"status": "error", "data": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
