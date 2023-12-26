@@ -38,7 +38,7 @@ class Loginview(APIView):
                 visitor = "administrateur"
         payload = {
             "id" : user.id , 
-            "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=10) ,
+            "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=60*24*10) ,
             "iat" : datetime.datetime.utcnow()
         }
         token = jwt.encode(payload,'secret', algorithm="HS256")
