@@ -19,10 +19,18 @@ from . import models
 import PyPDF2
 from django.db import connections
 from django.http import JsonResponse
-from elasticsearch_dsl import Date, Document, Search, Text
+#from elasticsearch_dsl import Date, Document, Search, Text
 from rest_framework.pagination import PageNumberPagination
-
-
+import requests
+from googleapiclient.discovery import build
+#from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from django.shortcuts import HttpResponse
+from googleapiclient.http import MediaIoBaseDownload
+from apiclient import discovery
+from httplib2 import Http
+from oauth2client import file, client, tools
+import os
 class Registerview(APIView):
     def post(self , request): 
         user = User.objects.filter(name=request.data["name"]).first()
@@ -110,7 +118,7 @@ class ModeratorUpdate(APIView):
             return Response({
                 "ERROR" : "Not valid"
             })
-
+"""
 class ArticleIndex(Document):
     titre = Text(fields={'raw': Text(index=False)}) 
     resume = Text()
@@ -295,3 +303,41 @@ class ArticleSearch(APIView):
 
         return Response({"results": results})
 
+"""
+
+def download_from_drive_view(request):
+    SCOPES = 'https://www.googleapis.com/auth/drive.readonly'
+    store = file.Storage('C:\\Users\\gigabyte\\Desktop\\TP_IGL\\ProjetIGL-Backend\\rechrchartc\\rchrchArtcl\\credentials\\credentials.json')  # Store your credentials here
+    creds = store.get()
+
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets('C:\\Users\\gigabyte\\Desktop\\TP_IGL\\ProjetIGL-Backend\\rechrchartc\\rchrchArtcl\\client_secret.json', SCOPES)  # Path to your client_secret.json
+        creds = tools.run_flow(flow, store)
+
+    DRIVE = discovery.build('drive', 'v2', http=creds.authorize(Http()))
+
+    # ID of the folder containing the files you want to download
+    folder_id = '1kadnheliuIjL6jDajVb06VoenM-E5p0c'
+
+    # Directory in your Django project to save the downloaded files
+    local_directory = 'C:\\Users\\gigabyte\\Desktop\\TP_IGL\\ProjetIGL-Backend\\rechrchartc\\UploadedFiles'
+
+    results = DRIVE.files().list(q=f"'{folder_id}' in parents", fields="files(id, name)").execute()
+    files = results.get('files', [])
+
+    if not files:
+       return HttpResponse('No files found in the specified folder.')
+    else:
+      for file_item in files:  # Renamed 'file' to 'file_item'
+        file_id = file_item.get('id')
+        file_name = file_item.get('name')
+        request = DRIVE.files().get_media(fileId=file_id)
+        fh = open(os.path.join(local_directory, file_name), 'wb')
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+        fh.close()
+        print('Downloaded "%s" to "%s"' % (file_name, local_directory))
+
+    return HttpResponse('Files downloaded successfully!')
