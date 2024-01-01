@@ -32,10 +32,12 @@ class Registerview(APIView):
             serializer = UserSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(serializer)
+            return Response({
+                "Validation" : "valid" , 
+            })
         else:
             return Response({
-                "ERROR" : "Not valid"
+                "Validation" : "Not valid"
             })
 class Loginview(APIView):
     def post(self , request):
@@ -54,21 +56,18 @@ class Loginview(APIView):
         elif admin is not None :
             if  admin.password==password:
                 visitor = "administrateur"
-        payload = {
-            "id" : user.id , 
-            "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=60*24*10) ,
-            "iat" : datetime.datetime.utcnow()
-        }
-        token = jwt.encode(payload,'secret', algorithm="HS256")
-        reponse = Response() 
-        reponse.data = {
-            "token" : token , 
-             "visitor" : visitor 
-        }
-        reponse.set_cookie("SESSION",value=token) 
-        return reponse 
-    
-
+        if visitor != "Not Found":
+            reponse = Response() 
+            reponse.data = {
+                "token" : name, 
+                "visitor" : visitor , 
+                "Validation" : "valid"
+            }
+            return reponse 
+        else: return Response({
+            "Validation" : "Not valid"
+        })
+        
 class ModeratorList(APIView):
     def get(self,request):
         mods = Moderateurs.objects.all()
