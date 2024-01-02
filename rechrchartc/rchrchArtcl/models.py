@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
 
 class Admins(models.Model):
      id = models.BigAutoField(primary_key=True)
@@ -14,14 +17,17 @@ class Moderateurs(models.Model):
 class Article(models.Model):
      id = models.BigAutoField(primary_key=True)
      titre = models.CharField(max_length=255)
+     auteurs = models.CharField(max_length=255)
+     institutions = models.CharField(max_length=255)
+     references = models.TextField()
+     mot_cles = models.CharField(max_length=255)
      resume = models.TextField()
      contenu = models.TextField()
-     pdf = models.TextField()
+     pdf = models.FileField(upload_to='pdfs/')
      date_pub = models.DateField(auto_now_add=True)
 
-class Mot_cle(models.Model):
-     mot = models.TextField()
-     article = models.ForeignKey(Article ,on_delete=models.CASCADE)
+class TempModel(models.Model):
+     pdf = models.FileField(upload_to='temp_pdfs/')
 
      
 class User(AbstractUser):
@@ -34,24 +40,14 @@ class User(AbstractUser):
      REQUIRED_FIELDS = []
      USERNAME_FIELD = "name"
 
-class Institution(models.Model):
-     id = models.BigAutoField(primary_key=True)
-     nom = models.CharField(max_length=255)
-     adresse = models.CharField(max_length=255)
-
-
-class Auteurs(models.Model):
-     id = models.BigAutoField(primary_key=True)
-     institutions = models.ForeignKey(Institution,on_delete=models.CASCADE)
-     nom = models.CharField(max_length=255)
-     email = models.CharField(max_length=255)
-     articles = models.ManyToManyField(Article)
-
-class References(models.Model):
-     id = models.BigAutoField(primary_key=True)
-     article = models.ForeignKey(Article ,on_delete=models.CASCADE)
-     contenu = models.CharField(max_length=512)
-
+@receiver(pre_delete, sender=TempModel)
+def delete_file_on_object_delete(sender, instance, **kwargs):
+     # Pass False so FileField doesn't save the model
+     instance.pdf.delete(False)
+@receiver(pre_delete, sender=Article)
+def delete_file_on_object_delete(sender, instance, **kwargs):
+     # Pass False so FileField doesn't save the model
+     instance.pdf.delete(False)
 
      
 

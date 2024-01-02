@@ -17,37 +17,10 @@ class ModerateursSerializer(ModelSerializer):
 
 
 # When we retreive an article we want to retreive also : its key words, references, authors and their institutions
-class InstitutionSerializer(ModelSerializer):
-    class Meta:
-        model = Institution
-        fields = ['nom']
 
-class AuteursSerializer(ModelSerializer):
-    institutions = InstitutionSerializer()  # Include Institution data
-
-    class Meta:
-        model = Auteurs
-        fields = ['nom', 'institutions']  
-            
-
-
-# Serialization of the Mot cle            
-class MotCleSerializer(ModelSerializer):
-    class Meta:
-        model = Mot_cle
-        fields = ['mot'] 
-
-# Serialization of the references            
-class ReferencesSerializer(ModelSerializer):
-    class Meta:
-        model = References
-        fields = ['contenu'] 
             
 class ArticleSerializer(ModelSerializer):
-    auteurs = AuteursSerializer(many=True, read_only=True)
-    mot_cle = MotCleSerializer(many=True, read_only=True)
-    references=ReferencesSerializer(many=True, read_only=True)
 
     class Meta:
         model = Article
-        fields = ['id', 'titre', 'resume', 'contenu', 'pdf', 'date_pub', 'auteurs', 'mot_cle', 'references']
+        fields = ['id', 'titre','auteurs','institutions','references','mot_cles','resume','contenu','pdf','date_pub']
