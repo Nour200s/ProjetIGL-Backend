@@ -1,15 +1,11 @@
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+
 from rest_framework.views import APIView 
-from .api.serializers import UserSerializer ,ModerateursSerializer,InstitutionSerializer,AuteursSerializer,MotCleSerializer,ReferencesSerializer,ArticleSerializer
+from .api.serializers import *
 from rest_framework.response import Response 
 
-from .models import User ,Moderateurs, Admins,Institution,Article,Mot_cle,References,Auteurs
+from .models import *
 
 import jwt , datetime  
-from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView,UpdateView,DeleteView
-from django.urls import reverse_lazy
 
 from rest_framework import status
 from .api import serializers
@@ -20,17 +16,9 @@ import PyPDF2
 from django.db import connections
 from django.http import JsonResponse
 from elasticsearch_dsl import Date, Document, Search, Text
-from rest_framework.pagination import PageNumberPagination
 
-import requests
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 from django.shortcuts import HttpResponse
-from googleapiclient.http import MediaIoBaseDownload
-from apiclient import discovery
-from httplib2 import Http
-from oauth2client import file, client, tools
+
 import os
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -159,7 +147,6 @@ class ArticleAdd(APIView):
        nlp = spacy.load("en_core_web_sm")
        doc = nlp(text)
 
-    def post(self,request):
        organizations = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
 
        return organizations
@@ -223,7 +210,6 @@ class ArticleAdd(APIView):
             content = self.extract(result ,"introduction" ,"references")
         authors = ",".join(self.extract_authors(first_page))
         refrences = self.extract(result ,"references" , "fin_de_article")
-        print(refrences)
         instit = ",".join(self.extract_organizations(self.extract_to(result,"ccs")))
         if "KEYWORDS" in result :
             keywords = self.extract(result ,"keywords" ,"acm")
@@ -248,6 +234,9 @@ class ArticleAdd(APIView):
             mot_cles = keywords
         )
         temp.delete()
+        
+
+
         return Response("Article ajoutée")
 class ArticleViewset(APIView):
     def get(self,request,id=None):

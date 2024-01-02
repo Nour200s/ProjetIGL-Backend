@@ -16,11 +16,11 @@ class Moderateurs(models.Model):
 
 class Article(models.Model):
      id = models.BigAutoField(primary_key=True)
-     titre = models.CharField(max_length=255)
-     auteurs = models.CharField(max_length=255)
-     institutions = models.CharField(max_length=255)
+     titre = models.TextField()
+     auteurs = models.TextField()
+     institutions = models.TextField()
      references = models.TextField()
-     mot_cles = models.CharField(max_length=255)
+     mot_cles = models.TextField()
      resume = models.TextField()
      contenu = models.TextField()
      pdf = models.FileField(upload_to='pdfs/')
