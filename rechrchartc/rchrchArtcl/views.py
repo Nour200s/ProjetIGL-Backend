@@ -1,26 +1,25 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView 
-from .api.serializers import UserSerializer ,ModerateursSerializer,InstitutionSerializer,AuteursSerializer,MotCleSerializer,ReferencesSerializer,ArticleSerializer
+from .api.serializers import UserSerializer ,ModerateursSerializer,ArticleSerializer
 from rest_framework.response import Response 
 
-from .models import User ,Moderateurs, Admins,Institution,Article,Mot_cle,References,Auteurs
+from .models import *
 
-import jwt , datetime  
-from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
 
 from rest_framework import status
-from .api import serializers
-import PyPDF2
-from . import models
 
-import PyPDF2
+
 from django.db import connections
 from django.http import JsonResponse
 from elasticsearch_dsl import Date, Document, Search, Text
 from rest_framework.pagination import PageNumberPagination
+
+#FOR TEXT EXTRACTION
+import fitz
+from .multi_column import column_boxes
+import spacy
 
 
 class Registerview(APIView):
@@ -123,17 +122,114 @@ class ArticleIndex(Document):
         name = 'articles'
 
 class ArticleAdd(APIView):
-    def extractText(pdf_file : str) -> [str] :
-        with open(pdf_file , 'rb') as pdf:
-            reader = PyPDF2.PdfFileReader(pdf ,strict=False)
-            pdf_text = []
-            for page in reader.pages:
-                content = page.extract_text()
-                pdf_text.append(content)
-            return pdf_text
+    def extract_authors(self,text):
+       nlp = spacy.load("en_core_web_sm")
+       doc = nlp(text)
+
+       person_names = [ent.text for ent in doc.ents if ent.label_ == "PERSON"]
+    
+       return person_names
+
+    def extract_organizations(self,text):
+       nlp = spacy.load("en_core_web_sm")
+       doc = nlp(text)
+
+       organizations = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
+    
+       return organizations
+
+    def extract(self,text:str,start_word:str,end_word:str):
+       parts = text.split("\n")
+       collect = False
+       result = ""
+       for part in parts:
+          comp_word = part.lower()
+          if start_word in comp_word  :
+             collect = True
+             continue
+          elif end_word in comp_word :
+             collect=False
+             break
+          if collect == True:
+            result += part+"\n"
+       return result
+    
+    def extract_to(self,text:str,end_word:str):
+        parts = text.split("\n")
+        result = ""
+        for part in parts:
+            comp_word = part.lower()
+            if comp_word.find(end_word) != -1:
+                break
+            result += part+"\n"
+        return result
+    
+    def extract_organizations(self,text):
+        nlp = spacy.load("en_core_web_sm")
+        doc = nlp(text)
+
+        organizations = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
+        
+        return organizations
+    
+    def extract_infos(self,pdf_name:str):
+        doc = fitz.open(pdf_name)
+        result = ""
+        title = ""
+        first_page = ""
+        flag1 = True
+        flag2 = True
+        for page in doc:
+            bboxes = column_boxes(page, footer_margin=50, no_image_text=True)
+            for rect in bboxes:
+                result += page.get_text(clip=rect, sort=True)
+                if flag1:
+                    title = result
+                    flag1 = False
+                if flag2 :
+                    first_page += page.get_text(clip=rect, sort=True)
+            flag2 = False
+                
+        resume = self.extract(result,"abstract","ccs")
+        if (result.find("ACKNOWLEDGMENTS") != -1):
+            content = self.extract(result ,"introduction" ,"acknowledgments")
+        else:
+            content = self.extract(result ,"introduction" ,"references")
+        authors = ",".join(self.extract_authors(first_page))
+        refrences = self.extract(result ,"references" , "fin_de_article")
+        print(refrences)
+        instit = ",".join(self.extract_organizations(self.extract_to(result,"ccs")))
+        if "KEYWORDS" in result :
+            keywords = self.extract(result ,"keywords" ,"acm")
+        else:
+            keywords = ""
+        return title,authors,content,resume,refrences,instit,keywords
+    
+    def post(self ,request ,*args, **kwargs):
+        pdf = request.data["pdf"]
+        temp = TempModel.objects.create(
+            pdf = pdf
+        )
+        title,authors,content,resume,refrences,instit,keywords = self.extract_infos(temp.pdf.path)
+        Article.objects.create(
+            titre = title,
+            auteurs = authors,
+            contenu = content,
+            resume = resume,
+            references = refrences,
+            pdf = pdf,
+            institutions = instit,
+            mot_cles = keywords
+        )
+        temp.delete()
+        return Response("Article ajoutée")
+    
+
+        
 
 
-    def post(self,request):
+
+    """def post(self,request):
         pdf = request.data[""]
     
         # Retrieve Article instance and related objects
@@ -165,12 +261,12 @@ class ArticleAdd(APIView):
         )
         article_index.save()
 
-        return JsonResponse({'message': 'Article indexed successfully'})
+        return JsonResponse({'message': 'Article indexed successfully'})"""
     
 
 
 
-class ArticleViewset(APIView):
+"""class ArticleViewset(APIView):
     def get(self,request,id=None):
         if id:
             item = models.Article.objects.get(id=id)
@@ -254,7 +350,7 @@ class ArticleViewset(APIView):
         )
         article_index.save()
 
-        return JsonResponse({'message': 'Article indexed successfully'})
+        return JsonResponse({'message': 'Article indexed successfully'})"""
     
 
 
