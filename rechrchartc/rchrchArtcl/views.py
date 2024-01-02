@@ -1,16 +1,22 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView 
-from .api.serializers import UserSerializer ,ModerateursSerializer,ArticleSerializer
+from .api.serializers import UserSerializer ,ModerateursSerializer,InstitutionSerializer,AuteursSerializer,MotCleSerializer,ReferencesSerializer,ArticleSerializer
 from rest_framework.response import Response 
 
-from .models import *
+from .models import User ,Moderateurs, Admins,Institution,Article,Mot_cle,References,Auteurs
 
+import jwt , datetime  
+from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
 
 from rest_framework import status
+from .api import serializers
 
+from . import models
 
+import PyPDF2
 from django.db import connections
 from django.http import JsonResponse
 from elasticsearch_dsl import Date, Document, Search, Text
@@ -31,12 +37,10 @@ class Registerview(APIView):
             serializer = UserSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response({
-                "Validation" : "valid" , 
-            })
+            return Response(serializer)
         else:
             return Response({
-                "Validation" : "Not valid"
+                "ERROR" : "Not valid"
             })
 class Loginview(APIView):
     def post(self , request):
@@ -55,18 +59,21 @@ class Loginview(APIView):
         elif admin is not None :
             if  admin.password==password:
                 visitor = "administrateur"
-        if visitor != "Not Found":
-            reponse = Response() 
-            reponse.data = {
-                "token" : name, 
-                "visitor" : visitor , 
-                "Validation" : "valid"
-            }
-            return reponse 
-        else: return Response({
-            "Validation" : "Not valid"
-        })
-        
+        payload = {
+            "id" : user.id , 
+            "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=60*24*10) ,
+            "iat" : datetime.datetime.utcnow()
+        }
+        token = jwt.encode(payload,'secret', algorithm="HS256")
+        reponse = Response() 
+        reponse.data = {
+            "token" : token , 
+             "visitor" : visitor 
+        }
+        reponse.set_cookie("SESSION",value=token) 
+        return reponse 
+    
+
 class ModeratorList(APIView):
     def get(self,request):
         mods = Moderateurs.objects.all()
@@ -117,25 +124,32 @@ class ArticleIndex(Document):
     keywords = Text(multi=True)  
     author = Text()  
     institus = Text(multi=True)
-
     class Index:
         name = 'articles'
-
 class ArticleAdd(APIView):
+    def extractText(pdf_file : str) -> [str] :
+        with open(pdf_file , 'rb') as pdf:
+            reader = PyPDF2.PdfFileReader(pdf ,strict=False)
+            pdf_text = []
+            for page in reader.pages:
+                content = page.extract_text()
+                pdf_text.append(content)
+            return pdf_text
     def extract_authors(self,text):
        nlp = spacy.load("en_core_web_sm")
        doc = nlp(text)
 
        person_names = [ent.text for ent in doc.ents if ent.label_ == "PERSON"]
-    
+
        return person_names
 
     def extract_organizations(self,text):
        nlp = spacy.load("en_core_web_sm")
        doc = nlp(text)
 
+    def post(self,request):
        organizations = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
-    
+
        return organizations
 
     def extract(self,text:str,start_word:str,end_word:str):
@@ -153,7 +167,7 @@ class ArticleAdd(APIView):
           if collect == True:
             result += part+"\n"
        return result
-    
+
     def extract_to(self,text:str,end_word:str):
         parts = text.split("\n")
         result = ""
@@ -163,15 +177,15 @@ class ArticleAdd(APIView):
                 break
             result += part+"\n"
         return result
-    
+
     def extract_organizations(self,text):
         nlp = spacy.load("en_core_web_sm")
         doc = nlp(text)
 
         organizations = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
-        
+
         return organizations
-    
+
     def extract_infos(self,pdf_name:str):
         doc = fitz.open(pdf_name)
         result = ""
@@ -189,7 +203,7 @@ class ArticleAdd(APIView):
                 if flag2 :
                     first_page += page.get_text(clip=rect, sort=True)
             flag2 = False
-                
+
         resume = self.extract(result,"abstract","ccs")
         if (result.find("ACKNOWLEDGMENTS") != -1):
             content = self.extract(result ,"introduction" ,"acknowledgments")
@@ -204,7 +218,7 @@ class ArticleAdd(APIView):
         else:
             keywords = ""
         return title,authors,content,resume,refrences,instit,keywords
-    
+
     def post(self ,request ,*args, **kwargs):
         pdf = request.data["pdf"]
         temp = TempModel.objects.create(
@@ -223,50 +237,7 @@ class ArticleAdd(APIView):
         )
         temp.delete()
         return Response("Article ajoutée")
-    
-
-        
-
-
-
-    """def post(self,request):
-        pdf = request.data[""]
-    
-        # Retrieve Article instance and related objects
-        article = Article.objects.create(
-            titre=titre,
-            resume=resume,
-            contenu=contenu,
-            date_pub=date_pub
-        )
-        author = Auteurs.objects.get(id=author_id)
-        institus = Institution.objects.filter(id__in=institus_ids)
-        keywords_objs = Mot_cle.objects.filter(mot__in=keywords)
-
-        # Associate the Article with author, institutions, and keywords
-        article.authors.add(author)
-        article.institus.set(institus)
-        article.keywords.set(keywords_objs)
-
-        # Index the article in Elasticsearch
-        connections.create_connection(hosts=['localhost:9200'])
-        article_index = ArticleIndex(
-            titre=article.titre,
-            resume=article.resume,
-            contenu=article.contenu,
-            date_pub=article.date_pub,
-            keywords=[keyword.mot for keyword in keywords_objs],
-            author=article.authors.first().nom if article.authors.exists() else '',
-            institus=[institus.nom for institus in article.institus.all()]
-        )
-        article_index.save()
-
-        return JsonResponse({'message': 'Article indexed successfully'})"""
-    
-
-
-
-"""class ArticleViewset(APIView):
+class ArticleViewset(APIView):
     def get(self,request,id=None):
         if id:
             item = models.Article.objects.get(id=id)
@@ -350,7 +321,7 @@ class ArticleAdd(APIView):
         )
         article_index.save()
 
-        return JsonResponse({'message': 'Article indexed successfully'})"""
+        return JsonResponse({'message': 'Article indexed successfully'})
     
 
 

@@ -144,3 +144,8 @@ ELASTICSEARCH_DSL = {
         'hosts': 'localhost:9200',  # Replace with your Elasticsearch server details
     },
 }
+
+import os 
+GOOGLE_DRIVE_CLIENT_ID = os.environ.get('GOOGLE_DRIVE_CLIENT_ID')
+GOOGLE_DRIVE_CLIENT_SECRET = os.environ.get('GOOGLE_DRIVE_CLIENT_SECRET')
+save_credentials: True
