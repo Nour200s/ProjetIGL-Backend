@@ -22,6 +22,18 @@ from django.http import JsonResponse
 from elasticsearch_dsl import Date, Document, Search, Text
 from rest_framework.pagination import PageNumberPagination
 
+import requests
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from django.shortcuts import HttpResponse
+from googleapiclient.http import MediaIoBaseDownload
+from apiclient import discovery
+from httplib2 import Http
+from oauth2client import file, client, tools
+import os
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 #FOR TEXT EXTRACTION
 import fitz 
 from .multi_column import column_boxes
@@ -407,3 +419,29 @@ class ArticleViewset(APIView):
     def get(self,request):
         articales =   Article.objects.all() 
         return Response(articales)
+# c'est la fonction d'upload qui fait l'upload des fichiers pdf a partir d'in url de  google drive qui contient les pdf et puis les met dans le repertoire Uploaded files pour qu'on puisse les utiliser dans l'extraction apres envoyer le repertoire a la base des données de elastic search
+# j'ai utiliser google drive API
+def download_from_drive_view(request):
+    # Authenticate using the local web server flow
+    gauth = GoogleAuth()
+    gauth.DEFAULT_SETTINGS['client_config_file'] = 'C:/Users/gigabyte/Desktop/TP_IGL/ProjetIGL-Backend/rechrchartc/rchrchArtcl/client_secret.json'
+    gauth.LocalWebserverAuth()
+
+    # Create a GoogleDrive instance after authentication
+    drive = GoogleDrive(gauth)
+
+    download_directory = 'C:/Users/gigabyte/Desktop/TP_IGL/ProjetIGL-Backend/rechrchartc/UploadedFiles'
+
+    #  the actual folder ID in Google Drive
+    folder_id = '1kadnheliuIjL6jDajVb06VoenM-E5p0c'
+
+    # Get the list of files in the specified folder
+    file_list = drive.ListFile({'q': f"'{folder_id}' in parents and trashed=false"}).GetList()
+
+    # Download files from the folder
+    for index, file in enumerate(file_list):
+        file_path = os.path.join(download_directory, file['title'])
+        print(f"{index+1}: File downloaded: {file['title']}")
+        file.GetContentFile(file_path)
+
+    return HttpResponse('Files downloaded successfully!')

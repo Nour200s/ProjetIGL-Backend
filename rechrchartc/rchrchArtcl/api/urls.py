@@ -12,4 +12,6 @@ urlpatterns = [
     path('articles/new',ArticleAdd.as_view()) , 
     path('article/<int:id>',ArticleViewset.as_view()),
     path('article/favoris/<int:Userid>/<int:Artid>',ArticleFavoris.as_view()), 
+    path('download-from-drive/', download_from_drive_view, name='download_from_drive'),
+
 ]
