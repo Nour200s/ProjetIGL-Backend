@@ -17,9 +17,9 @@ from elasticsearch_dsl import Date, Document, Search, Text
 from rest_framework.pagination import PageNumberPagination
 
 #FOR TEXT EXTRACTION
-import fitz
+import fitz 
 from .multi_column import column_boxes
-import spacy
+import spacy 
 
 
 class Registerview(APIView):
@@ -390,3 +390,49 @@ class ArticleSearch(APIView):
 
         return Response({"results": results})
 
+class ArticleFavoris(APIView):
+    def post(self , request,Userid,Artid): 
+        user = User.objects.get(id=Userid)
+        user.favoris.add(Artid)
+        return Response({
+                "Validation" : "valid" , 
+            })
+    def delete(self , request,Userid,Artid): 
+        try:
+            obj=Article.objects.get(id=Userid)
+        except Article.DoesNotExist:
+            msg={"msg" : "Article not found"}
+            return Response(msg,status=status.HTTP_404_NOT_FOUND)
+        obj.favoris.remove(Artid)
+        return Response({"status":"success","data":"item Deleted" })  
+class ArticleViewset(APIView):
+    # Post 
+    def post (self,request):
+        serializer = ArticleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status":"success","data":serializer.data},status=status.HTTP_200_OK)
+        else:
+            return Response({"status":"error","data":serializer.error},status=status.HTTP_400_BAD_REQUEST)
+    #Delete 
+    def delete(self,request,id):
+        try:
+            obj=Article.objects.get(id=id)
+        except Article.DoesNotExist:
+            msg={"msg" : "Article not found"}
+            return Response(msg,status=status.HTTP_404_NOT_FOUND)
+        obj.delete()  
+        return Response({"status":"success","data":"item Deleted" })  
+    #update  
+    def patch(self, request, id):
+        my_model = Article.objects.get(id=id)
+        serializer = ArticleSerializer(my_model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #Get all article 
+    def get(self,request):
+        articales =   Article.objects.all() 
+        return Response(articales)
