@@ -1,15 +1,10 @@
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView 
-from .api.serializers import UserSerializer ,ModerateursSerializer,ArticleSerializer
+from .api.serializers import *
 from rest_framework.response import Response 
-from . import models
-from .models import User ,Moderateurs, Admins,Article,TempModel
+
+from .models import *
 
 import jwt , datetime  
-from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView,UpdateView,DeleteView
-from django.urls import reverse_lazy
 
 from rest_framework import status
 from .api import serializers
@@ -20,22 +15,16 @@ import PyPDF2
 from django.db import connections
 from django.http import JsonResponse
 from elasticsearch_dsl import Date, Document, Search, Text
-from rest_framework.pagination import PageNumberPagination
-import requests
-from googleapiclient.discovery import build
-#from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
+
 from django.shortcuts import HttpResponse
-from googleapiclient.http import MediaIoBaseDownload
-from apiclient import discovery
-from httplib2 import Http
-from oauth2client import file, client, tools
+
 import os
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-import fitz
+#FOR TEXT EXTRACTION
+import fitz 
 from .multi_column import column_boxes
-import spacy
+import spacy 
 
 
 class Registerview(APIView):
@@ -155,7 +144,8 @@ class ArticleAdd(APIView):
 
     def extract_organizations(self,text):
        nlp = spacy.load("en_core_web_sm")
-       doc = nlp(text)    
+       doc = nlp(text)
+
        organizations = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
 
        return organizations
@@ -219,7 +209,6 @@ class ArticleAdd(APIView):
             content = self.extract(result ,"introduction" ,"references")
         authors = ",".join(self.extract_authors(first_page))
         refrences = self.extract(result ,"references" , "fin_de_article")
-        print(refrences)
         instit = ",".join(self.extract_organizations(self.extract_to(result,"ccs")))
         if "KEYWORDS" in result :
             keywords = self.extract(result ,"keywords" ,"acm")
@@ -244,9 +233,12 @@ class ArticleAdd(APIView):
             mot_cles = keywords
         )
         temp.delete()
+        
+
+
         return Response("Article ajoutée")
 class ArticleViewset(APIView):
-    """def get(self,request,id=None):
+    def get(self,request,id=None):
         if id:
             item = models.Article.objects.get(id=id)
             serializer = serializers.ArticleSerializer(item)
@@ -289,7 +281,7 @@ class ArticleViewset(APIView):
             msg={"msg" : "Article not found"}
             return Response(msg,status=status.HTTP_404_NOT_FOUND)
         obj.delete()  
-        return Response({"status":"success","data":"item Deleted" })   """        
+        return Response({"status":"success","data":"item Deleted" })           
     
 
     def patch_references(self, request, id=None):
@@ -369,8 +361,52 @@ class ArticleSearch(APIView):
 
         return Response({"results": results})
 
-
-    
+class ArticleFavoris(APIView):
+    def post(self , request,Userid,Artid): 
+        user = User.objects.get(id=Userid)
+        user.favoris.add(Artid)
+        return Response({
+                "Validation" : "valid" , 
+            })
+    def delete(self , request,Userid,Artid): 
+        try:
+            obj=Article.objects.get(id=Userid)
+        except Article.DoesNotExist:
+            msg={"msg" : "Article not found"}
+            return Response(msg,status=status.HTTP_404_NOT_FOUND)
+        obj.favoris.remove(Artid)
+        return Response({"status":"success","data":"item Deleted" })  
+class ArticleViewset(APIView):
+    # Post 
+    def post (self,request):
+        serializer = ArticleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status":"success","data":serializer.data},status=status.HTTP_200_OK)
+        else:
+            return Response({"status":"error","data":serializer.error},status=status.HTTP_400_BAD_REQUEST)
+    #Delete 
+    def delete(self,request,id):
+        try:
+            obj=Article.objects.get(id=id)
+        except Article.DoesNotExist:
+            msg={"msg" : "Article not found"}
+            return Response(msg,status=status.HTTP_404_NOT_FOUND)
+        obj.delete()  
+        return Response({"status":"success","data":"item Deleted" })  
+    #update  
+    def patch(self, request, id):
+        my_model = Article.objects.get(id=id)
+        serializer = ArticleSerializer(my_model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #Get all article 
+    def get(self,request):
+        articales =   Article.objects.all() 
+        return Response(articales)
 # c'est la fonction d'upload qui fait l'upload des fichiers pdf a partir d'in url de  google drive qui contient les pdf et puis les met dans le repertoire Uploaded files pour qu'on puisse les utiliser dans l'extraction apres envoyer le repertoire a la base des données de elastic search
 # j'ai utiliser google drive API
 def download_from_drive_view(request):
