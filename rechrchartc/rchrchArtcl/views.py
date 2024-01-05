@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView 
-from .api.serializers import UserSerializer ,ModerateursSerializer,InstitutionSerializer,AuteursSerializer,MotCleSerializer,ReferencesSerializer,ArticleSerializer
+from .api.serializers import UserSerializer ,ModerateursSerializer,ArticleSerializer
 from rest_framework.response import Response 
-
-from .models import User ,Moderateurs, Admins,Institution,Article,Mot_cle,References,Auteurs
+from . import models
+from .models import User ,Moderateurs, Admins,Article,TempModel
 
 import jwt , datetime  
 from django.views.generic.list import ListView
@@ -23,7 +23,7 @@ from elasticsearch_dsl import Date, Document, Search, Text
 from rest_framework.pagination import PageNumberPagination
 import requests
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
+#from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from django.shortcuts import HttpResponse
 from googleapiclient.http import MediaIoBaseDownload
@@ -155,9 +155,7 @@ class ArticleAdd(APIView):
 
     def extract_organizations(self,text):
        nlp = spacy.load("en_core_web_sm")
-       doc = nlp(text)
-
-    def post(self,request):
+       doc = nlp(text)    
        organizations = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
 
        return organizations
@@ -248,7 +246,7 @@ class ArticleAdd(APIView):
         temp.delete()
         return Response("Article ajoutée")
 class ArticleViewset(APIView):
-    def get(self,request,id=None):
+    """def get(self,request,id=None):
         if id:
             item = models.Article.objects.get(id=id)
             serializer = serializers.ArticleSerializer(item)
@@ -291,7 +289,7 @@ class ArticleViewset(APIView):
             msg={"msg" : "Article not found"}
             return Response(msg,status=status.HTTP_404_NOT_FOUND)
         obj.delete()  
-        return Response({"status":"success","data":"item Deleted" })           
+        return Response({"status":"success","data":"item Deleted" })   """        
     
 
     def patch_references(self, request, id=None):
