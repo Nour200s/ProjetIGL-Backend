@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .models import *
 
 import jwt , datetime  
+from oauth2client.service_account import ServiceAccountCredentials
 
 from rest_framework import status
 from .api import serializers
@@ -17,7 +18,7 @@ from django.http import JsonResponse
 from elasticsearch_dsl import Date, Document, Search, Text
 
 from django.shortcuts import HttpResponse
-
+from django.test import TestCase, Client
 import os
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -408,28 +409,40 @@ class ArticleViewset(APIView):
         articales =   Article.objects.all() 
         return Response(articales)
 # c'est la fonction d'upload qui fait l'upload des fichiers pdf a partir d'in url de  google drive qui contient les pdf et puis les met dans le repertoire Uploaded files pour qu'on puisse les utiliser dans l'extraction apres envoyer le repertoire a la base des données de elastic search
-# j'ai utiliser google drive API
-def download_from_drive_view(request):
-    # Authenticate using the local web server flow
+# j'ai utiliser google drive API et Service account pour permettre a n'importe quel user d'uploader 
+  
+def download_from_drive_view(request,drive_url):
     gauth = GoogleAuth()
-    gauth.DEFAULT_SETTINGS['client_config_file'] = 'C:/Users/gigabyte/Desktop/TP_IGL/ProjetIGL-Backend/rechrchartc/rchrchArtcl/client_secret.json'
-    gauth.LocalWebserverAuth()
+    gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        'C:/Users/gigabyte/Desktop/TP_IGL/ProjetIGL-Backend/rechrchartc/rchrchArtcl/ServiceAccount.json',
+        ['https://www.googleapis.com/auth/drive']
+    )
 
-    # Create a GoogleDrive instance after authentication
     drive = GoogleDrive(gauth)
 
     download_directory = 'C:/Users/gigabyte/Desktop/TP_IGL/ProjetIGL-Backend/rechrchartc/UploadedFiles'
 
-    #  the actual folder ID in Google Drive
-    folder_id = '1kadnheliuIjL6jDajVb06VoenM-E5p0c'
+    # Extract folder ID from the Drive URL
+    url_parts = drive_url.split('/')
+    folder_id = url_parts[-1]  # Assuming the folder ID is at the end of the URL
 
-    # Get the list of files in the specified folder
     file_list = drive.ListFile({'q': f"'{folder_id}' in parents and trashed=false"}).GetList()
 
-    # Download files from the folder
+    # Download only PDF files
     for index, file in enumerate(file_list):
-        file_path = os.path.join(download_directory, file['title'])
-        print(f"{index+1}: File downloaded: {file['title']}")
-        file.GetContentFile(file_path)
+        if file['title'].endswith('.pdf'):
+            file_path = os.path.join(download_directory, file['title'])
+            try:
+                file.GetContentFile(file_path)
+                print(f"{index+1}: File downloaded: {file['title']}")
+            except:
+                print(f"Failed to download: {file['title']}")
 
-    return HttpResponse('Files downloaded successfully!')
+    return HttpResponse('PDF Files downloaded successfully!')
+    
+# c'est une fonction pour tester 
+def Test(request):
+    # Vous pouvez fournir ici le drive_url à la fonction download_from_drive_view
+    drive_url = 'https://drive.google.com/drive/folders/1kadnheliuIjL6jDajVb06VoenM-E5p0c'
+    response = download_from_drive_view(request, drive_url)
+    return response
