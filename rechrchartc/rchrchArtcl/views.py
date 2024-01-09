@@ -26,7 +26,9 @@ from pydrive.drive import GoogleDrive
 import fitz 
 from .multi_column import column_boxes
 import spacy 
-
+from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import ConnectionError
+from elasticsearch.exceptions import NotFoundError
 
 class Registerview(APIView):
     def post(self , request): 
@@ -446,3 +448,71 @@ def Test(request):
     drive_url = 'https://drive.google.com/drive/folders/1kadnheliuIjL6jDajVb06VoenM-E5p0c'
     response = download_from_drive_view(request, drive_url)
     return response
+
+
+def check_elasticsearch_connection():
+    try:
+        # Initialize an Elasticsearch client
+        es = Elasticsearch(['http://localhost:9200'])  # Replace with your Elasticsearch server details
+
+        # Check the connection by pinging the Elasticsearch server
+        if es.ping():
+            return True  # Connection successful
+        else:
+            return False  # Ping failed
+    except ConnectionError:
+        return False 
+    
+def Test2(request):
+    connected = check_elasticsearch_connection()
+    if connected:
+        return HttpResponse("Connected to Elasticsearch server.")
+    else:
+        return HttpResponse("Connection to Elasticsearch server failed.")
+    
+#@crsf_exempt 
+def get_article_details(request, article_id):
+    # Initialize Elasticsearch client
+    es = Elasticsearch(['http://username:password@localhost:9200'])
+
+    try:
+        # Retrieve the article from Elasticsearch using its ID
+        article = es.get(index='index1', id=article_id)  # Replace 'your_index_name' with your index name
+
+        # Return article details as JSON response
+        return JsonResponse(article['_source'])
+    except NotFoundError:
+        return JsonResponse({'error': 'Article not found'}, status=404)    
+
+
+def delete_article(request, article_id):
+    # Replace 'your_username' and 'your_password' with your Elasticsearch credentials
+   
+    # Initialize Elasticsearch client with authentication
+    es = Elasticsearch(['http://username:password@localhost:9200'])
+
+    try:
+        # Delete the article using its ID
+        es.delete(index='index1', id=article_id)
+        return JsonResponse({'message': 'Article deleted successfully'})
+    except NotFoundError:
+        return JsonResponse({'error': 'Article not found'}, status=404)        
+    
+
+def get_all_articles(request):
+   
+
+    # Initialize Elasticsearch client with authentication
+    es = Elasticsearch([f'http://username:password@localhost:9200'])
+
+    try:
+        # Search for all articles in the specified index
+        search_results = es.search(index='index1', body={"query": {"match_all": {}}})
+        
+        # Extract article data from search results
+        articles = [hit['_source'] for hit in search_results['hits']['hits']]
+        
+        # Return articles as JSON response
+        return JsonResponse({'articles': articles})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)    
