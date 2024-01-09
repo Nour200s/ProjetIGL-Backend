@@ -12,7 +12,7 @@ class UserSerializer(ModelSerializer):
 class ModerateursSerializer(ModelSerializer):
     class Meta(object):
         model = Moderateurs
-        fields = ['id','name','password']
+        fields = ['id','name','email','password']
         
 
 
