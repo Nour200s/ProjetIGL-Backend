@@ -236,91 +236,6 @@ class ArticleAdd(APIView):
 
 
         return Response("Article ajoutée")
-class ArticleViewset(APIView):
-    def get(self,request,id=None):
-        if id:
-            item = models.Article.objects.get(id=id)
-            serializer = serializers.ArticleSerializer(item)
-            return Response({"status":"success","data":serializer.data},status=status.HTTP_200_OK)
-        items=models.Article.objects.all()
-        serializer = serializers.ArticleSerializer(items,many=True)
-        return Response({"status":"success","data":serializer.data},status=status.HTTP_200_OK)
-    
-
-    # Post 
-    def post (self,request):
-        serializer = ArticleSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"status":"success","data":serializer.data},status=status.HTTP_200_OK)
-        else:
-            return Response({"status":"error","data":serializer.error},status=status.HTTP_400_BAD_REQUEST)
-        
-    # Patch
-   
-
-    def patch(self, request, id=None):
-        try:
-            article_instance = models.Article.objects.get(id=id)
-        except models.Article.DoesNotExist:
-            return Response({"status": "error", "message": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = serializers.ArticleSerializer(article_instance, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
-        return Response({"status": "error", "data": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
-
-    #Delete 
-    def delete(self,request,id):
-        try:
-            obj=Article.objects.get(id=id)
-        except Article.DoesNotExist:
-            msg={"msg" : "Article not found"}
-            return Response(msg,status=status.HTTP_404_NOT_FOUND)
-        obj.delete()  
-        return Response({"status":"success","data":"item Deleted" })           
-    
-
-    def patch_references(self, request, id=None):
-        try:
-            article_instance = models.Article.objects.get(id=id)
-        except models.Article.DoesNotExist:
-            return Response({"status": "error", "message": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        references_data = request.data.get('references', {})  # Assuming references are in the request payload
-
-        serializer = serializers.ReferencesSerializer(
-            instance=article_instance.references,
-            data=references_data,
-            partial=True
-        )
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
-        return Response({"status": "error", "data": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Associate the Article with author, institutions, and keywords
-        article.authors.add(author)
-        article.institus.set(institus)
-        article.keywords.set(keywords_objs)
-
-        # Index the article in Elasticsearch
-        connections.create_connection(hosts=['localhost:9200'])
-        article_index = ArticleIndex(
-            titre=article.titre,
-            resume=article.resume,
-            contenu=article.contenu,
-            date_pub=article.date_pub,
-            keywords=[keyword.mot for keyword in keywords_objs],
-            author=article.authors.first().nom if article.authors.exists() else '',
-            institus=[institus.nom for institus in article.institus.all()]
-        )
-        article_index.save()
-
-        return JsonResponse({'message': 'Article indexed successfully'})
     
 
 
@@ -375,6 +290,9 @@ class ArticleFavoris(APIView):
             return Response(msg,status=status.HTTP_404_NOT_FOUND)
         obj.favoris.remove(Artid)
         return Response({"status":"success","data":"item Deleted" })  
+    
+
+
 class ArticleViewset(APIView):
     # Post 
     def post (self,request):
@@ -393,6 +311,7 @@ class ArticleViewset(APIView):
             return Response(msg,status=status.HTTP_404_NOT_FOUND)
         obj.delete()  
         return Response({"status":"success","data":"item Deleted" })  
+    
     #update  
     def patch(self, request, id):
         my_model = Article.objects.get(id=id)
@@ -406,6 +325,11 @@ class ArticleViewset(APIView):
     def get(self,request):
         articales =   Article.objects.all() 
         return Response(articales)
+    
+
+
+
+
 # c'est la fonction d'upload qui fait l'upload des fichiers pdf a partir d'in url de  google drive qui contient les pdf et puis les met dans le repertoire Uploaded files pour qu'on puisse les utiliser dans l'extraction apres envoyer le repertoire a la base des données de elastic search
 # j'ai utiliser google drive API et Service account pour permettre a n'importe quel user d'uploader 
   
