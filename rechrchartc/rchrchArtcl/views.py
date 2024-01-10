@@ -115,10 +115,11 @@ class ModeratorUpdate(APIView):
             })
 
 class ArticleIndex(Document):
-    titre = Text(fields={'raw': Text(index=False)}) 
-    resume = Text()
-    contenu = Text()
-    date_pub = Date()
+    id = Text()
+    title = Text(fields={'raw': Text(index=False)}) 
+    sumup = Text()
+    content= Text()
+    date = Date()
     keywords = Text(multi=True)  
     author = Text()  
     institus = Text(multi=True)
@@ -221,7 +222,7 @@ class ArticleAdd(APIView):
             pdf = pdf
         )
         title,authors,content,resume,refrences,instit,keywords = self.extract_infos(temp.pdf.path)
-        Article.objects.create(
+        article = Article.objects.create(
             titre = title,
             auteurs = authors,
             contenu = content,
@@ -231,10 +232,21 @@ class ArticleAdd(APIView):
             institutions = instit,
             mot_cles = keywords
         )
+         # Index the article in Elasticsearch
+        connections.create_connection(hosts=['localhost:9200'])
+        article_index = ArticleIndex(
+            meta={'id': article.id},
+            id=str(article.id),
+            title=article.titre,
+            sumup=article.resume,
+            content=article.contenu,
+            date=article.date_pub,
+            keywords=article.mot_cles.split(',') if article.mot_cles else [],
+            author=article.auteurs,
+            institus=article.institutions.split(',') if article.institutions else [],
+        )
+        article_index.save()
         temp.delete()
-        
-
-
         return Response("Article ajoutée")
     
 
@@ -256,8 +268,6 @@ class ArticleSearch(APIView):
             fields=['titre', 'resume', 'contenu', 'keywords', 'author', 'institus']
         ).sort('-date_pub')[start:start + int(size)]
         response = search.execute()
-
-
         # Process and return search results
         results = []
         for hit in response:
