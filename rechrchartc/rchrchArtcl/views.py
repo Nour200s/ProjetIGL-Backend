@@ -1,3 +1,4 @@
+import termios
 from rest_framework.views import APIView 
 from .api.serializers import *
 from rest_framework.response import Response 
@@ -15,7 +16,7 @@ from . import models
 import PyPDF2
 from django.db import connections
 from django.http import JsonResponse
-from elasticsearch_dsl import Date, Document, Search, Text
+from elasticsearch_dsl import Q, Date, Document, Search,Term ,Text,Range
 
 from django.shortcuts import HttpResponse
 from django.test import TestCase, Client
@@ -249,10 +250,19 @@ class ArticleAdd(APIView):
         temp.delete()
         return Response("Article ajoutée")
     
-
-
-
 class ArticleSearch(APIView):
+    def filter_by_keywords(self, search, keywords):
+        return search.query('multi_match', query=keywords, fields=['title', 'resume', 'contenu', 'keywords'])
+    
+    def filter_by_authors(self, search, auteurs):
+        return search.query(Q('terms', author=auteurs))
+
+    def filter_by_institutions(self, search, institutions):
+        return search.query(Q('terms', institus=institutions.split(',')))
+
+    def filter_by_date_range(self, search, start_date, end_date):
+        return search.query(Range(date_pub={'gte': start_date, 'lte': end_date}))
+    
     def get(self, request):
         # Get user's search query from the request
         search_query = request.GET.get('q', '')
@@ -267,6 +277,26 @@ class ArticleSearch(APIView):
             'multi_match', query=search_query,
             fields=['titre', 'resume', 'contenu', 'keywords', 'author', 'institus']
         ).sort('-date_pub')[start:start + int(size)]
+
+       # Apply filters
+        keywords = request.GET.get('keywords')
+        authors = request.GET.get('authors')
+        institutions = request.GET.get('institutions')
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        if keywords:
+            search = self.filter_by_keywords(search, keywords)
+
+        if authors:
+            search = self.filter_by_authors(search, authors)
+
+        if institutions:
+            search = self.filter_by_institutions(search, institutions)
+
+        if start_date and end_date:
+            search = self.filter_by_date_range(search, start_date, end_date)
+        # Execute the search 
         response = search.execute()
         # Process and return search results
         results = []
