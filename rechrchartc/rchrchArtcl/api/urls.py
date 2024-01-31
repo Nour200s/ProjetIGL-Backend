@@ -14,9 +14,9 @@ urlpatterns = [
     path('article/favoris/<int:Userid>/<int:Artid>',ArticleFavoris.as_view()), 
     path('download-from-drive/', Test, name='download_from_drive'),
     path('Test2/', Test2, name='download_from_drive'),
+    path('GetALL/', get_all_articles, name='article_details'),
     path('articles_details/<str:article_id>/', get_article_details, name='article_details'),
     path('deleteArticle/<str:article_id>/', delete_article, name='article_details'),
-    path('GetALL/', get_all_articles, name='article_details'),
 
 
 ]

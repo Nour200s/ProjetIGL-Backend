@@ -1,9 +1,9 @@
 from rest_framework.views import APIView 
 from .api.serializers import *
 from rest_framework.response import Response 
-
+from dotenv import load_dotenv
 from .models import *
-
+from decouple import config
 import jwt , datetime  
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -29,6 +29,8 @@ import spacy
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import ConnectionError
 from elasticsearch.exceptions import NotFoundError
+from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt
 
 class Registerview(APIView):
     def post(self , request): 
@@ -442,6 +444,7 @@ def download_from_drive_view(request,drive_url):
 
     return HttpResponse('PDF Files downloaded successfully!')
     
+
 # c'est une fonction pour tester 
 def Test(request):
     # Vous pouvez fournir ici le drive_url à la fonction download_from_drive_view
@@ -470,49 +473,58 @@ def Test2(request):
     else:
         return HttpResponse("Connection to Elasticsearch server failed.")
     
-#@crsf_exempt 
+
 def get_article_details(request, article_id):
-    # Initialize Elasticsearch client
-    es = Elasticsearch(['http://username:password@localhost:9200'])
+    es = Elasticsearch([f'http://elastic:8eCLcea63hBwu11_K9mu@localhost:9200'])
 
     try:
         # Retrieve the article from Elasticsearch using its ID
-        article = es.get(index='index1', id=article_id)  # Replace 'your_index_name' with your index name
+        article = es.get(index='index1', id=article_id) 
 
         # Return article details as JSON response
         return JsonResponse(article['_source'])
     except NotFoundError:
-        return JsonResponse({'error': 'Article not found'}, status=404)    
-
+        return JsonResponse({'error': 'Article not found'}, status=404)
 
 def delete_article(request, article_id):
-    # Replace 'your_username' and 'your_password' with your Elasticsearch credentials
    
     # Initialize Elasticsearch client with authentication
-    es = Elasticsearch(['http://username:password@localhost:9200'])
-
+    es = Elasticsearch([f'http://elastic:8eCLcea63hBwu11_K9mu@localhost:9200'])
     try:
         # Delete the article using its ID
         es.delete(index='index1', id=article_id)
         return JsonResponse({'message': 'Article deleted successfully'})
     except NotFoundError:
         return JsonResponse({'error': 'Article not found'}, status=404)        
+ 
+
+  
     
 
 def get_all_articles(request):
-   
+    try:     
 
-    # Initialize Elasticsearch client with authentication
-    es = Elasticsearch([f'http://username:password@localhost:9200'])
+        # Initialize Elasticsearch client with authentication
+        es = Elasticsearch([f'http://elastic:8eCLcea63hBwu11_K9mu@localhost:9200'])
 
-    try:
         # Search for all articles in the specified index
         search_results = es.search(index='index1', body={"query": {"match_all": {}}})
-        
+
         # Extract article data from search results
         articles = [hit['_source'] for hit in search_results['hits']['hits']]
-        
-        # Return articles as JSON response
-        return JsonResponse({'articles': articles})
+
+        # Return articles as standardized JSON response
+        response_data = {
+            'success': True,
+            'message': 'Articles retrieved successfully',
+            'data': {'articles': articles},
+        }
+        return JsonResponse(response_data)
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)    
+        # Return error as standardized JSON response
+        error_response = {
+            'success': False,
+            'message': 'Error retrieving articles',
+            'error': str(e),
+        }
+        return JsonResponse(error_response, status=500)    
