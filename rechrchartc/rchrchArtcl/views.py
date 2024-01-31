@@ -1,9 +1,10 @@
+import termios
 from rest_framework.views import APIView 
 from .api.serializers import *
 from rest_framework.response import Response 
-from dotenv import load_dotenv
+
 from .models import *
-from decouple import config
+
 import jwt , datetime  
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -15,7 +16,7 @@ from . import models
 import PyPDF2
 from django.db import connections
 from django.http import JsonResponse
-from elasticsearch_dsl import Date, Document, Search, Text
+from elasticsearch_dsl import Q, Date, Document, Search,Term ,Text,Range
 
 from django.shortcuts import HttpResponse
 from django.test import TestCase, Client
@@ -29,8 +30,6 @@ import spacy
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import ConnectionError
 from elasticsearch.exceptions import NotFoundError
-from rest_framework.decorators import api_view
-from django.views.decorators.csrf import csrf_exempt
 
 class Registerview(APIView):
     def post(self , request): 
@@ -63,19 +62,17 @@ class Loginview(APIView):
         elif admin is not None :
             if  admin.password==password:
                 visitor = "administrateur"
-        payload = {
-            "id" : user.id , 
-            "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=60*24*10) ,
-            "iat" : datetime.datetime.utcnow()
-        }
-        token = jwt.encode(payload,'secret', algorithm="HS256")
-        reponse = Response() 
-        reponse.data = {
-            "token" : token , 
-             "visitor" : visitor 
-        }
-        reponse.set_cookie("SESSION",value=token) 
-        return reponse 
+        if visitor != "Not Found":
+            reponse = Response() 
+            reponse.data = {
+                "token" : name, 
+                "visitor" : visitor , 
+                "Validation" : "valid"
+            }
+            return reponse 
+        else: return Response({
+            "Validation" : "Not valid"
+        })
     
 
 class ModeratorList(APIView):
@@ -121,10 +118,11 @@ class ModeratorUpdate(APIView):
             })
 
 class ArticleIndex(Document):
-    titre = Text(fields={'raw': Text(index=False)}) 
-    resume = Text()
-    contenu = Text()
-    date_pub = Date()
+    id = Text()
+    title = Text(fields={'raw': Text(index=False)}) 
+    sumup = Text()
+    content= Text()
+    date = Date()
     keywords = Text(multi=True)  
     author = Text()  
     institus = Text(multi=True)
@@ -227,7 +225,7 @@ class ArticleAdd(APIView):
             pdf = pdf
         )
         title,authors,content,resume,refrences,instit,keywords = self.extract_infos(temp.pdf.path)
-        Article.objects.create(
+        article = Article.objects.create(
             titre = title,
             auteurs = authors,
             contenu = content,
@@ -237,101 +235,36 @@ class ArticleAdd(APIView):
             institutions = instit,
             mot_cles = keywords
         )
-        temp.delete()
-        
-
-
-        return Response("Article ajoutée")
-class ArticleViewset(APIView):
-    def get(self,request,id=None):
-        if id:
-            item = models.Article.objects.get(id=id)
-            serializer = serializers.ArticleSerializer(item)
-            return Response({"status":"success","data":serializer.data},status=status.HTTP_200_OK)
-        items=models.Article.objects.all()
-        serializer = serializers.ArticleSerializer(items,many=True)
-        return Response({"status":"success","data":serializer.data},status=status.HTTP_200_OK)
-    
-
-    # Post 
-    def post (self,request):
-        serializer = ArticleSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"status":"success","data":serializer.data},status=status.HTTP_200_OK)
-        else:
-            return Response({"status":"error","data":serializer.error},status=status.HTTP_400_BAD_REQUEST)
-        
-    # Patch
-   
-
-    def patch(self, request, id=None):
-        try:
-            article_instance = models.Article.objects.get(id=id)
-        except models.Article.DoesNotExist:
-            return Response({"status": "error", "message": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = serializers.ArticleSerializer(article_instance, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
-        return Response({"status": "error", "data": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
-
-    #Delete 
-    def delete(self,request,id):
-        try:
-            obj=Article.objects.get(id=id)
-        except Article.DoesNotExist:
-            msg={"msg" : "Article not found"}
-            return Response(msg,status=status.HTTP_404_NOT_FOUND)
-        obj.delete()  
-        return Response({"status":"success","data":"item Deleted" })           
-    
-
-    def patch_references(self, request, id=None):
-        try:
-            article_instance = models.Article.objects.get(id=id)
-        except models.Article.DoesNotExist:
-            return Response({"status": "error", "message": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        references_data = request.data.get('references', {})  # Assuming references are in the request payload
-
-        serializer = serializers.ReferencesSerializer(
-            instance=article_instance.references,
-            data=references_data,
-            partial=True
-        )
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
-        return Response({"status": "error", "data": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Associate the Article with author, institutions, and keywords
-        article.authors.add(author)
-        article.institus.set(institus)
-        article.keywords.set(keywords_objs)
-
-        # Index the article in Elasticsearch
+         # Index the article in Elasticsearch
         connections.create_connection(hosts=['localhost:9200'])
         article_index = ArticleIndex(
-            titre=article.titre,
-            resume=article.resume,
-            contenu=article.contenu,
-            date_pub=article.date_pub,
-            keywords=[keyword.mot for keyword in keywords_objs],
-            author=article.authors.first().nom if article.authors.exists() else '',
-            institus=[institus.nom for institus in article.institus.all()]
+            meta={'id': article.id},
+            id=str(article.id),
+            title=article.titre,
+            sumup=article.resume,
+            content=article.contenu,
+            date=article.date_pub,
+            keywords=article.mot_cles.split(',') if article.mot_cles else [],
+            author=article.auteurs,
+            institus=article.institutions.split(',') if article.institutions else [],
         )
         article_index.save()
-
-        return JsonResponse({'message': 'Article indexed successfully'})
+        temp.delete()
+        return Response("Article ajoutée")
     
-
-
-
 class ArticleSearch(APIView):
+    def filter_by_keywords(self, search, keywords):
+        return search.query('multi_match', query=keywords, fields=['title', 'resume', 'contenu', 'keywords'])
+    
+    def filter_by_authors(self, search, auteurs):
+        return search.query(Q('terms', author=auteurs))
+
+    def filter_by_institutions(self, search, institutions):
+        return search.query(Q('terms', institus=institutions.split(',')))
+
+    def filter_by_date_range(self, search, start_date, end_date):
+        return search.query(Range(date_pub={'gte': start_date, 'lte': end_date}))
+    
     def get(self, request):
         # Get user's search query from the request
         search_query = request.GET.get('q', '')
@@ -346,9 +279,27 @@ class ArticleSearch(APIView):
             'multi_match', query=search_query,
             fields=['titre', 'resume', 'contenu', 'keywords', 'author', 'institus']
         ).sort('-date_pub')[start:start + int(size)]
+
+       # Apply filters
+        keywords = request.GET.get('keywords')
+        authors = request.GET.get('authors')
+        institutions = request.GET.get('institutions')
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        if keywords:
+            search = self.filter_by_keywords(search, keywords)
+
+        if authors:
+            search = self.filter_by_authors(search, authors)
+
+        if institutions:
+            search = self.filter_by_institutions(search, institutions)
+
+        if start_date and end_date:
+            search = self.filter_by_date_range(search, start_date, end_date)
+        # Execute the search 
         response = search.execute()
-
-
         # Process and return search results
         results = []
         for hit in response:
@@ -381,6 +332,9 @@ class ArticleFavoris(APIView):
             return Response(msg,status=status.HTTP_404_NOT_FOUND)
         obj.favoris.remove(Artid)
         return Response({"status":"success","data":"item Deleted" })  
+    
+
+
 class ArticleViewset(APIView):
     # Post 
     def post (self,request):
@@ -399,6 +353,7 @@ class ArticleViewset(APIView):
             return Response(msg,status=status.HTTP_404_NOT_FOUND)
         obj.delete()  
         return Response({"status":"success","data":"item Deleted" })  
+    
     #update  
     def patch(self, request, id):
         my_model = Article.objects.get(id=id)
@@ -412,6 +367,11 @@ class ArticleViewset(APIView):
     def get(self,request):
         articales =   Article.objects.all() 
         return Response(articales)
+    
+
+
+
+
 # c'est la fonction d'upload qui fait l'upload des fichiers pdf a partir d'in url de  google drive qui contient les pdf et puis les met dans le repertoire Uploaded files pour qu'on puisse les utiliser dans l'extraction apres envoyer le repertoire a la base des données de elastic search
 # j'ai utiliser google drive API et Service account pour permettre a n'importe quel user d'uploader 
   
@@ -444,6 +404,13 @@ def download_from_drive_view(request,drive_url):
 
     return HttpResponse('PDF Files downloaded successfully!')
     
+# c'est une fonction pour tester 
+def Test(request):
+    # Vous pouvez fournir ici le drive_url à la fonction download_from_drive_view
+    drive_url = 'https://drive.google.com/drive/folders/1kadnheliuIjL6jDajVb06VoenM-E5p0c'
+    response = download_from_drive_view(request, drive_url)
+    return response
+
 
 # c'est une fonction pour tester 
 def Test(request):

@@ -19,4 +19,6 @@ urlpatterns = [
     path('deleteArticle/<str:article_id>/', delete_article, name='article_details'),
 
 
+
+
 ]

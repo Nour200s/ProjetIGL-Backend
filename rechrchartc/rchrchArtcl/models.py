@@ -12,6 +12,7 @@ class Admins(models.Model):
 class Moderateurs(models.Model):
      id = models.BigAutoField(primary_key=True)
      name = models.CharField(max_length=255,unique=True)
+     email = models.EmailField()
      password = models.CharField(max_length=255)
 
 class Article(models.Model):
