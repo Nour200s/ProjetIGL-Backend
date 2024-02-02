@@ -1,7 +1,9 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
+from .models import Moderateurs ,User
 from .models import Article
+from .views import ModeratorUpdate
 
 
 class ArticleViewsetTestCase(TestCase):
@@ -17,9 +19,43 @@ class ArticleViewsetTestCase(TestCase):
            institutions = "Tech University, Python Learning Center",
            mot_cles = "Python, Programming, Beginners, Tutorial",
         )
+
+        self.data = {
+                'name' : 'test',
+                'email' : 'test@gmail.com',
+                'password' : 'test123',
+                    }
         
         # Configurer le client de l'API pour effectuer des requêtes
         self.client = APIClient()
+
+
+    def testSignIn(self):
+         # Créer un utilisateur avec les données définies
+        utilisateur = User.objects.create(**self.data)
+
+        # Récupérer le nom de l'utilisateur 'nom est unique'
+        nom = utilisateur.name
+
+        # Vérifier si le nom de l'utilisateur correspond à celui défini dans self.data
+        self.assertEqual(nom, self.data['name'])    
+
+    
+    def testDeleteModerator(self): 
+        
+        
+        # Créer un modérateur pour effectuer la suppression
+        moderator = Moderateurs.objects.create(name='test1',email='test@gmail.com',password='test123')
+        # Effectuer une requête DELETE pour supprimer le modérateur
+        response = self.client.delete(f'/recharchartc/recharchArtcl/api/moderateurs/{self.moderator.id}/')
+
+        # Vérifier si la suppression du modérateur a réussi (statut HTTP 204 No Content)
+        self.assertEqual(response.status_code, 204)
+
+        # Vérifier si le modérateur a été supprimé de la base de données
+        self.assertFalse(Moderateurs.objects.filter(id=moderator.id).exists())
+
+
 
     def test_patch_article(self):
         """
