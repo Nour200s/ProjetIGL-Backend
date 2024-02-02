@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="fr" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rchrchArtcl package &mdash; Documentation rechrchartc 1.0.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=05dadb3a"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/translations.js?v=d99ca74e"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Recherche" href="search.html" />
+    <link rel="next" title="rchrchArtcl.migrations package" href="rchrchArtcl.migrations.html" />
+    <link rel="prev" title="manage module" href="manage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            rechrchartc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Rechercher docs" aria-label="Rechercher docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">rechrchartc</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="conf.html">conf module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manage.html">manage module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">rchrchArtcl package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html">rchrchArtcl.migrations package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rchrchArtcl.admin">rchrchArtcl.admin module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rchrchArtcl.apps">rchrchArtcl.apps module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.apps.RchrchartclConfig"><code class="docutils literal notranslate"><span class="pre">RchrchartclConfig</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rchrchArtcl.models">rchrchArtcl.models module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.models.Admins"><code class="docutils literal notranslate"><span class="pre">Admins</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.models.Article"><code class="docutils literal notranslate"><span class="pre">Article</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.models.Moderateurs"><code class="docutils literal notranslate"><span class="pre">Moderateurs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.models.TempModel"><code class="docutils literal notranslate"><span class="pre">TempModel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.models.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.models.delete_file_on_object_delete"><code class="docutils literal notranslate"><span class="pre">delete_file_on_object_delete()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rchrchArtcl.multi_column">rchrchArtcl.multi_column module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#features">Features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#restrictions">Restrictions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.multi_column.column_boxes"><code class="docutils literal notranslate"><span class="pre">column_boxes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rchrchArtcl.tests">rchrchArtcl.tests module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.tests.ArticleViewsetTestCase"><code class="docutils literal notranslate"><span class="pre">ArticleViewsetTestCase</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rchrchArtcl.views">rchrchArtcl.views module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.ArticleFavoris"><code class="docutils literal notranslate"><span class="pre">ArticleFavoris</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.ArticleViewset"><code class="docutils literal notranslate"><span class="pre">ArticleViewset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.Loginview"><code class="docutils literal notranslate"><span class="pre">Loginview</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.ModeratorList"><code class="docutils literal notranslate"><span class="pre">ModeratorList</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.ModeratorUpdate"><code class="docutils literal notranslate"><span class="pre">ModeratorUpdate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.Registerview"><code class="docutils literal notranslate"><span class="pre">Registerview</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.Test"><code class="docutils literal notranslate"><span class="pre">Test()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.Test2"><code class="docutils literal notranslate"><span class="pre">Test2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.check_elasticsearch_connection"><code class="docutils literal notranslate"><span class="pre">check_elasticsearch_connection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.delete_article"><code class="docutils literal notranslate"><span class="pre">delete_article()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.download_from_drive_view"><code class="docutils literal notranslate"><span class="pre">download_from_drive_view()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.get_all_articles"><code class="docutils literal notranslate"><span class="pre">get_all_articles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rchrchArtcl.views.get_article_details"><code class="docutils literal notranslate"><span class="pre">get_article_details()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rchrchArtcl">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rechrchartc.html">rechrchartc package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">rechrchartc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">rechrchartc</a></li>
+      <li class="breadcrumb-item active">rchrchArtcl package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/rchrchArtcl.rst.txt" rel="nofollow"> Afficher la source de la page</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rchrchartcl-package">
+<h1>rchrchArtcl package<a class="headerlink" href="#rchrchartcl-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rchrchArtcl.migrations.html">rchrchArtcl.migrations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rchrchArtcl.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rchrchArtcl.migrations.html#module-rchrchArtcl.migrations.0001_initial">rchrchArtcl.migrations.0001_initial module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0001_initial.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0001_initial.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0001_initial.Migration.initial"><code class="docutils literal notranslate"><span class="pre">Migration.initial</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0001_initial.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rchrchArtcl.migrations.html#module-rchrchArtcl.migrations.0002_remove_article_nom">rchrchArtcl.migrations.0002_remove_article_nom module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0002_remove_article_nom.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0002_remove_article_nom.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0002_remove_article_nom.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rchrchArtcl.migrations.html#module-rchrchArtcl.migrations.0003_tempmodel">rchrchArtcl.migrations.0003_tempmodel module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0003_tempmodel.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0003_tempmodel.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0003_tempmodel.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rchrchArtcl.migrations.html#module-rchrchArtcl.migrations.0004_alter_article_auteurs_alter_article_institutions_and_more">rchrchArtcl.migrations.0004_alter_article_auteurs_alter_article_institutions_and_more module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0004_alter_article_auteurs_alter_article_institutions_and_more.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0004_alter_article_auteurs_alter_article_institutions_and_more.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0004_alter_article_auteurs_alter_article_institutions_and_more.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rchrchArtcl.migrations.html#module-rchrchArtcl.migrations.0005_alter_article_auteurs_alter_article_institutions_and_more">rchrchArtcl.migrations.0005_alter_article_auteurs_alter_article_institutions_and_more module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0005_alter_article_auteurs_alter_article_institutions_and_more.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0005_alter_article_auteurs_alter_article_institutions_and_more.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0005_alter_article_auteurs_alter_article_institutions_and_more.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rchrchArtcl.migrations.html#module-rchrchArtcl.migrations.0006_moderateurs_email">rchrchArtcl.migrations.0006_moderateurs_email module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0006_moderateurs_email.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0006_moderateurs_email.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rchrchArtcl.migrations.html#rchrchArtcl.migrations.0006_moderateurs_email.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rchrchArtcl.migrations.html#module-rchrchArtcl.migrations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rchrchArtcl.admin">
+<span id="rchrchartcl-admin-module"></span><h2>rchrchArtcl.admin module<a class="headerlink" href="#module-rchrchArtcl.admin" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rchrchArtcl.apps">
+<span id="rchrchartcl-apps-module"></span><h2>rchrchArtcl.apps module<a class="headerlink" href="#module-rchrchArtcl.apps" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.apps.RchrchartclConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.apps.</span></span><span class="sig-name descname"><span class="pre">RchrchartclConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/apps.html#RchrchartclConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.apps.RchrchartclConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rchrchArtcl.apps.RchrchartclConfig.default_auto_field">
+<span class="sig-name descname"><span class="pre">default_auto_field</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'django.db.models.BigAutoField'</span></em><a class="headerlink" href="#rchrchArtcl.apps.RchrchartclConfig.default_auto_field" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rchrchArtcl.apps.RchrchartclConfig.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rchrchArtcl'</span></em><a class="headerlink" href="#rchrchArtcl.apps.RchrchartclConfig.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rchrchArtcl.models">
+<span id="rchrchartcl-models-module"></span><h2>rchrchArtcl.models module<a class="headerlink" href="#module-rchrchArtcl.models" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.models.Admins">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.models.</span></span><span class="sig-name descname"><span class="pre">Admins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/models.html#Admins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.models.Admins" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>Modèle représentant un administrateur dans la base de données.</p>
+<p>Champs :
+- <cite>id</cite> : Clé primaire automatiquement générée.
+- <cite>name</cite> : Nom de l’administrateur.
+- <cite>password</cite> : Mot de passe de l’administrateur.</p>
+<p>Méthodes :
+- Aucune méthode spécifique définie dans ce modèle.</p>
+<p>Exemple d’utilisation :
+<a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
+# Création d’un nouvel administrateur
+new_admin = Admins.objects.create(</p>
+<blockquote>
+<div><p>name= »admin_user »,
+password= »secure_password123 »,</p>
+</div></blockquote>
+<section id="id5">
+<h3>)<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.models.Article">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.models.</span></span><span class="sig-name descname"><span class="pre">Article</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/models.html#Article"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.models.Article" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>Modèle représentant un article dans la base de données.</p>
+<p>Champs :
+- <cite>id</cite> : Clé primaire automatiquement générée.
+- <cite>titre</cite> : Titre de l’article.
+- <cite>auteurs</cite> : Les auteurs de l’article.
+- <cite>institutions</cite> : Les institutions liées à l’article.
+- <cite>references</cite> : Les références bibliographiques de l’article.
+- <cite>mot_cles</cite> : Les mots-clés associés à l’article.
+- <cite>resume</cite> : Un résumé de l’article.
+- <cite>contenu</cite> : Le contenu principal de l’article.
+- <cite>pdf</cite> : Le chemin vers le fichier PDF associé à l’article.
+- <cite>date_pub</cite> : La date de publication de l’article.</p>
+<p>Méthodes :
+- Aucune méthode spécifique définie dans ce modèle.</p>
+<p>Exemple d’utilisation :
+<a href="#id6"><span class="problematic" id="id7">``</span></a><a href="#id8"><span class="problematic" id="id9">`</span></a>python
+# Création d’un nouvel article
+new_article = Article.objects.create(</p>
+<blockquote>
+<div><p>titre= »Introduction to Django »,
+auteurs= »John Doe »,
+institutions= »Tech University »,
+references= »Doe, J. (2022). Django: A Comprehensive Guide. »,
+mot_cles= »Django, Web Development, Beginners »,
+resume= »Overview of Django’s features and usage. »,
+contenu= »A beginner’s guide to Django web framework. »,
+pdf= »/path/to/django_guide.pdf »,</p>
+</div></blockquote>
+<section id="id10">
+<h3>)<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.models.Moderateurs">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.models.</span></span><span class="sig-name descname"><span class="pre">Moderateurs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/models.html#Moderateurs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.models.Moderateurs" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>Modèle représentant un modérateur dans la base de données.</p>
+<p>Champs :
+- <cite>id</cite> : Clé primaire automatiquement générée.
+- <cite>name</cite> : Nom du modérateur.
+- <cite>email</cite> : Adresse e-mail du modérateur.
+- <cite>password</cite> : Mot de passe du modérateur.</p>
+<p>Méthodes :
+- Aucune méthode spécifique définie dans ce modèle.</p>
+<p>Exemple d’utilisation :
+<a href="#id11"><span class="problematic" id="id12">``</span></a><a href="#id13"><span class="problematic" id="id14">`</span></a>python
+# Création d’un nouveau modérateur
+new_moderator = Moderateurs.objects.create(</p>
+<blockquote>
+<div><p>name= »moderator_user »,
+email= »<a class="reference external" href="mailto:moderator&#37;&#52;&#48;example&#46;com">moderator<span>&#64;</span>example<span>&#46;</span>com</a> »,
+password= »secure_password456 »,</p>
+</div></blockquote>
+<section id="id15">
+<h3>)<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.models.TempModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.models.</span></span><span class="sig-name descname"><span class="pre">TempModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/models.html#TempModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.models.TempModel" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>Modèle temporaire représentant un fichier PDF téléchargé.</p>
+<p>Champs :
+- <cite>pdf</cite> : Le fichier PDF téléchargé.</p>
+<p>Méthodes :
+- Aucune méthode spécifique définie dans ce modèle.</p>
+<p>Exemple d’utilisation :
+<a href="#id16"><span class="problematic" id="id17">``</span></a><a href="#id18"><span class="problematic" id="id19">`</span></a>python
+# Création d’une nouvelle instance TempModel
+temp_model_instance = TempModel.objects.create(</p>
+<blockquote>
+<div><p>pdf= »/path/to/temporary_file.pdf »,</p>
+</div></blockquote>
+<section id="id20">
+<h3>)<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.models.User">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.models.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/models.html#User"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.models.User" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractUser</span></code></p>
+<p>Modèle personnalisé d’utilisateur héritant d’AbstractUser.</p>
+<p>Champs :
+- <cite>id</cite> : Clé primaire automatiquement générée.
+- <cite>name</cite> : Nom de l’utilisateur.
+- <cite>password</cite> : Mot de passe de l’utilisateur.
+- <cite>favoris</cite> : Relation ManyToMany avec les articles marqués comme favoris.</p>
+<p>Méthodes :
+- Aucune méthode spécifique définie dans ce modèle.</p>
+<p>Exemple d’utilisation :
+<a href="#id21"><span class="problematic" id="id22">``</span></a><a href="#id23"><span class="problematic" id="id24">`</span></a>python
+# Création d’un nouvel utilisateur
+new_user = User.objects.create(</p>
+<blockquote>
+<div><p>name= »john_doe »,
+password= »secure_password789 »,</p>
+</div></blockquote>
+<section id="id25">
+<h3>)<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rchrchArtcl.models.User.REQUIRED_FIELDS">
+<span class="sig-name descname"><span class="pre">REQUIRED_FIELDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#rchrchArtcl.models.User.REQUIRED_FIELDS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rchrchArtcl.models.User.USERNAME_FIELD">
+<span class="sig-name descname"><span class="pre">USERNAME_FIELD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'name'</span></em><a class="headerlink" href="#rchrchArtcl.models.User.USERNAME_FIELD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rchrchArtcl.models.User.favoris">
+<span class="sig-name descname"><span class="pre">favoris</span></span><a class="headerlink" href="#rchrchArtcl.models.User.favoris" title="Link to this definition"></a></dt>
+<dd><p>alias de <a class="reference internal" href="#rchrchArtcl.models.Article" title="rchrchArtcl.models.Article"><code class="xref py py-class docutils literal notranslate"><span class="pre">Article</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rchrchArtcl.models.User.last_login">
+<span class="sig-name descname"><span class="pre">last_login</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rchrchArtcl.models.User.last_login" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rchrchArtcl.models.User.username">
+<span class="sig-name descname"><span class="pre">username</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rchrchArtcl.models.User.username" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rchrchArtcl.models.delete_file_on_object_delete">
+<span class="sig-prename descclassname"><span class="pre">rchrchArtcl.models.</span></span><span class="sig-name descname"><span class="pre">delete_file_on_object_delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rchrchArtcl.models.delete_file_on_object_delete" title="Link to this definition"></a></dt>
+<dd><p>Fonction de signal pour supprimer le fichier associé à l’instance Article lors de la suppression de l’objet.</p>
+</dd></dl>
+
+</section>
+<section id="module-rchrchArtcl.multi_column">
+<span id="rchrchartcl-multi-column-module"></span><h2>rchrchArtcl.multi_column module<a class="headerlink" href="#module-rchrchArtcl.multi_column" title="Link to this heading"></a></h2>
+<p>This is an advanced PyMuPDF utility for detecting multi-column pages.
+It can be used in a shell script, or its main function can be imported and
+invoked as descript below.</p>
+<section id="features">
+<h3>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Identify text belonging to (a variable number of) columns on the page.</p></li>
+<li><p>Text with different background color is handled separately, allowing for
+easier treatment of side remarks, comment boxes, etc.</p></li>
+<li><p>Uses text block detection capability to identify text blocks and
+uses the block bboxes as primary structuring principle.</p></li>
+<li><p>Supports ignoring footers via a footer margin parameter.</p></li>
+<li><p>Returns re-created text boundary boxes (integer coordinates), sorted ascending
+by the top, then by the left coordinates.</p></li>
+</ul>
+</section>
+<section id="restrictions">
+<h3>Restrictions<a class="headerlink" href="#restrictions" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Only supporting horizontal, left-to-right text</p></li>
+<li><p>Returns a list of text boundary boxes - not the text itself. The caller is
+expected to extract text from within the returned boxes.</p></li>
+<li><p>Text written above images is ignored altogether (option).</p></li>
+<li><p>This utility works as expected in most cases. The following situation cannot
+be handled correctly:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>overlapping (non-disjoint) text blocks</p></li>
+<li><p>image captions are not recognized and are handled like normal text</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
+<ul>
+<li><p>As a CLI shell command use</p>
+<p>python multi_column.py input.pdf footer_margin</p>
+<p>Where footer margin is the height of the bottom stripe to ignore on each page.
+This code is intended to be modified according to your need.</p>
+</li>
+<li><p>Use in a Python script as follows:</p>
+<p>from multi_column import column_boxes</p>
+<p># for each page execute
+bboxes = column_boxes(page, footer_margin=50, no_image_text=True)</p>
+<p># bboxes is a list of fitz.IRect objects, that are sort ascending by their y0,
+# then x0 coordinates. Their text content can be extracted by all PyMuPDF
+# get_text() variants, like for instance the following:
+for rect in bboxes:</p>
+<blockquote>
+<div><p>print(page.get_text(clip=rect, sort=True))</p>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rchrchArtcl.multi_column.column_boxes">
+<span class="sig-prename descclassname"><span class="pre">rchrchArtcl.multi_column.</span></span><span class="sig-name descname"><span class="pre">column_boxes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">footer_margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_image_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/multi_column.html#column_boxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.multi_column.column_boxes" title="Link to this definition"></a></dt>
+<dd><p>Determine bboxes which wrap a column.</p>
+</dd></dl>
+
+</section>
+<section id="module-rchrchArtcl.tests">
+<span id="rchrchartcl-tests-module"></span><h2>rchrchArtcl.tests module<a class="headerlink" href="#module-rchrchArtcl.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.tests.ArticleViewsetTestCase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.tests.</span></span><span class="sig-name descname"><span class="pre">ArticleViewsetTestCase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/tests.html#ArticleViewsetTestCase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.tests.ArticleViewsetTestCase" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.tests.ArticleViewsetTestCase.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/tests.html#ArticleViewsetTestCase.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.tests.ArticleViewsetTestCase.setUp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.tests.ArticleViewsetTestCase.test_patch_article">
+<span class="sig-name descname"><span class="pre">test_patch_article</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/tests.html#ArticleViewsetTestCase.test_patch_article"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.tests.ArticleViewsetTestCase.test_patch_article" title="Link to this definition"></a></dt>
+<dd><p>Test de mise à jour partielle d’un article via une requête PATCH.</p>
+<p>Objectif du test :
+- Vérifier que la requête PATCH met à jour correctement les champs spécifiés de l’article.</p>
+<p>Étapes du test :
+1. Créer un objet Article.
+2. Effectuer une requête PATCH pour mettre à jour certains champs de l’article.
+3. Vérifier que la requête renvoie un code de statut 200 (OK).
+4. Actualiser l’objet article depuis la base de données.
+5. Vérifier que les champs mis à jour correspondent aux nouvelles données.</p>
+<p>Cette méthode de test vise à garantir que la fonctionnalité de mise à jour partielle des articles fonctionne correctement.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rchrchArtcl.views">
+<span id="rchrchartcl-views-module"></span><h2>rchrchArtcl.views module<a class="headerlink" href="#module-rchrchArtcl.views" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ArticleFavoris">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">ArticleFavoris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ArticleFavoris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ArticleFavoris" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">APIView</span></code></p>
+<p>Une vue basée sur les classes pour gérer les articles favoris d’un utilisateur.</p>
+<p>Cette vue prend en charge les requêtes POST et DELETE pour ajouter et supprimer des articles des favoris d’un utilisateur.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>Userid</cite> : L’identifiant de l’utilisateur.
+- <cite>Artid</cite> : L’identifiant de l’article.</p>
+<p>Retours :
+- Une réponse JSON indiquant la validation de l’opération.</p>
+<p>Méthodes :
+- <cite>post(request, Userid, Artid)</cite> : Gère la requête POST pour ajouter un article aux favoris d’un utilisateur.
+- <cite>delete(request, Userid, Artid)</cite> : Gère la requête DELETE pour supprimer un article des favoris d’un utilisateur.</p>
+<p>Exemple d’utilisation :
+<a href="#id26"><span class="problematic" id="id27">``</span></a><a href="#id28"><span class="problematic" id="id29">`</span></a>python
+# Exemple d’utilisation de ArticleFavoris
+class SomeView(APIView):</p>
+<blockquote>
+<div><dl>
+<dt>def some_method(self, request, Userid, Artid):</dt><dd><p># Ajout d’un article aux favoris
+article_favoris_view = ArticleFavoris()
+response_add = article_favoris_view.post(request, Userid, Artid)</p>
+<p># Suppression d’un article des favoris
+response_delete = article_favoris_view.delete(request, Userid, Artid)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id30"><span class="problematic" id="id31">``</span></a><a href="#id32"><span class="problematic" id="id33">`</span></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ArticleFavoris.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Userid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Artid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ArticleFavoris.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ArticleFavoris.delete" title="Link to this definition"></a></dt>
+<dd><p>Gère la requête DELETE pour supprimer un article des favoris d’un utilisateur.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>Userid</cite> : L’identifiant de l’utilisateur.
+- <cite>Artid</cite> : L’identifiant de l’article.</p>
+<p>Retours :
+- Une réponse JSON indiquant le statut de la suppression de l’item.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ArticleFavoris.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Userid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Artid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ArticleFavoris.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ArticleFavoris.post" title="Link to this definition"></a></dt>
+<dd><p>Gère la requête POST pour ajouter un article aux favoris d’un utilisateur.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>Userid</cite> : L’identifiant de l’utilisateur.
+- <cite>Artid</cite> : L’identifiant de l’article.</p>
+<p>Retours :
+- Une réponse JSON indiquant la validation de l’opération.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ArticleViewset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">ArticleViewset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ArticleViewset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ArticleViewset" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">APIView</span></code></p>
+<p>Une vue basée sur les classes pour effectuer des opérations CRUD sur les articles.</p>
+<p>Cette vue prend en charge les requêtes POST, DELETE, PATCH et GET pour créer, supprimer, mettre à jour et récupérer des articles.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>id</cite> : L’identifiant de l’article.</p>
+<p>Retours :
+- Pour la requête POST :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Une réponse JSON indiquant le statut de l’opération et les données de l’article créé.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Pour la requête DELETE :</dt><dd><ul>
+<li><p>Une réponse JSON indiquant le statut de la suppression de l’article.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Pour la requête PATCH :</dt><dd><ul>
+<li><p>Une réponse JSON indiquant le statut de la mise à jour de l’article.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Pour la requête GET :</dt><dd><ul>
+<li><p>Une réponse JSON contenant la liste de tous les articles.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Méthodes :
+- <cite>post(request)</cite> : Gère la requête POST pour créer un nouvel article.
+- <cite>delete(request, id)</cite> : Gère la requête DELETE pour supprimer un article.
+- <cite>patch(request, id)</cite> : Gère la requête PATCH pour mettre à jour un article.
+- <cite>get(request)</cite> : Gère la requête GET pour récupérer tous les articles.</p>
+<p>Exemple d’utilisation :
+<a href="#id34"><span class="problematic" id="id35">``</span></a><a href="#id36"><span class="problematic" id="id37">`</span></a>python
+# Exemple d’utilisation de ArticleViewset
+class SomeView(APIView):</p>
+<blockquote>
+<div><dl>
+<dt>def some_method(self, request):</dt><dd><p># Création d’un nouvel article
+article_viewset = ArticleViewset()
+response_post = article_viewset.post(request)</p>
+<p># Suppression d’un article
+response_delete = article_viewset.delete(request, id=1)</p>
+<p># Mise à jour d’un article
+response_patch = article_viewset.patch(request, id=1)</p>
+<p># Récupération de tous les articles
+response_get = article_viewset.get(request)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id38"><span class="problematic" id="id39">``</span></a><a href="#id40"><span class="problematic" id="id41">`</span></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ArticleViewset.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ArticleViewset.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ArticleViewset.delete" title="Link to this definition"></a></dt>
+<dd><p>Gère la requête DELETE pour supprimer un article.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>id</cite> : L’identifiant de l’article.</p>
+<p>Retours :
+- Une réponse JSON indiquant le statut de la suppression de l’article.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ArticleViewset.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ArticleViewset.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ArticleViewset.get" title="Link to this definition"></a></dt>
+<dd><p>Gère la requête GET pour récupérer tous les articles.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.</p>
+<p>Retours :
+- Une réponse JSON contenant la liste de tous les articles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ArticleViewset.patch">
+<span class="sig-name descname"><span class="pre">patch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ArticleViewset.patch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ArticleViewset.patch" title="Link to this definition"></a></dt>
+<dd><p>Gère la requête PATCH pour mettre à jour un article.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>id</cite> : L’identifiant de l’article.</p>
+<p>Retours :
+- Une réponse JSON indiquant le statut de la mise à jour de l’article.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ArticleViewset.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ArticleViewset.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ArticleViewset.post" title="Link to this definition"></a></dt>
+<dd><p>Gère la requête POST pour créer un nouvel article.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.</p>
+<p>Retours :
+- Une réponse JSON indiquant le statut de l’opération et les données de l’article créé.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.views.Loginview">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">Loginview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#Loginview"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.Loginview" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">APIView</span></code></p>
+<blockquote>
+<div><p>A class-based view for handling user login.</p>
+</div></blockquote>
+<p>This view authenticates users, moderators, and administrators based on the provided name and password.
+If the authentication is successful, it returns a token and information about the type of visitor.</p>
+<p>Parameters:
+- <cite>request</cite>: The Django HTTP request object.</p>
+<p>Returns:
+- If authentication is successful:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>A JSON response containing:</dt><dd><ul>
+<li><p>« token »: The user’s name (used as a token for simplicity).</p></li>
+<li><p>« visitor »: The type of visitor (user, moderator, or administrator).</p></li>
+<li><p>« Validation »: « valid »</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>If authentication fails:</dt><dd><ul>
+<li><p>A JSON response with « Validation »: « Not valid ».</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Example Usage:
+<a href="#id42"><span class="problematic" id="id43">``</span></a><a href="#id44"><span class="problematic" id="id45">`</span></a>python
+# Example usage of Loginview
+class SomeView(APIView):</p>
+<blockquote>
+<div><dl>
+<dt>def some_method(self, request):</dt><dd><p>name = request.data[« name »]
+password = request.data[« password »]</p>
+<p># Calling Loginview
+login_view = Loginview()
+response = login_view.post(request)</p>
+<p># Process the response
+if response.data[« Validation »] == « valid »:</p>
+<blockquote>
+<div><p># Authentication successful
+token = response.data[« token »]
+visitor_type = response.data[« visitor »]</p>
+</div></blockquote>
+<dl class="simple">
+<dt>else:</dt><dd><p># Authentication failed</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id46"><span class="problematic" id="id47">``</span></a><a href="#id48"><span class="problematic" id="id49">`</span></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.Loginview.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#Loginview.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.Loginview.post" title="Link to this definition"></a></dt>
+<dd><p>Handles the POST request for user login.</p>
+<p>Parameters:
+- <cite>request</cite>: The Django HTTP request object.</p>
+<p>Returns:
+- If authentication is successful:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>A JSON response containing:</dt><dd><ul>
+<li><p>« token »: The user’s name (used as a token for simplicity).</p></li>
+<li><p>« visitor »: The type of visitor (user, moderator, or administrator).</p></li>
+<li><p>« Validation »: « valid »</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>If authentication fails:</dt><dd><ul>
+<li><p>A JSON response with « Validation »: « Not valid ».</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ModeratorList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">ModeratorList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ModeratorList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ModeratorList" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">APIView</span></code></p>
+<p>A class-based view for retrieving a list of moderators.</p>
+<p>This view handles the GET request and returns a serialized list of all moderators.</p>
+<p>Parameters:
+- <cite>request</cite>: The Django HTTP request object.</p>
+<p>Returns:
+- A JSON response containing the serialized data of all moderators.</p>
+<p>Example Usage:
+<a href="#id50"><span class="problematic" id="id51">``</span></a><a href="#id52"><span class="problematic" id="id53">`</span></a>python
+# Example usage of ModeratorList
+class SomeView(APIView):</p>
+<blockquote>
+<div><dl>
+<dt>def some_method(self, request):</dt><dd><p># Calling ModeratorList
+moderator_list_view = ModeratorList()
+response = moderator_list_view.get(request)</p>
+<p># Process the response
+moderators_data = response.data</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id54"><span class="problematic" id="id55">``</span></a><a href="#id56"><span class="problematic" id="id57">`</span></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ModeratorList.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ModeratorList.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ModeratorList.get" title="Link to this definition"></a></dt>
+<dd><p>Handles the GET request for retrieving a list of moderators.</p>
+<p>Parameters:
+- <cite>request</cite>: The Django HTTP request object.</p>
+<p>Returns:
+- A JSON response containing the serialized data of all moderators.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ModeratorUpdate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">ModeratorUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ModeratorUpdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ModeratorUpdate" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">APIView</span></code></p>
+<p>Une vue basée sur les classes pour la mise à jour des modérateurs.</p>
+<p>Cette vue prend en charge les requêtes GET, PUT, DELETE et POST pour la mise à jour et la manipulation des modérateurs.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>pk</cite> : La clé primaire (ID) du modérateur à manipuler.</p>
+<p>Retours :
+- Pour la requête GET :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Une réponse JSON contenant les données sérialisées du modérateur avec l’ID spécifié.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Pour la requête PUT :</dt><dd><ul>
+<li><p>Une réponse JSON contenant les données sérialisées du modérateur mis à jour.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Pour la requête DELETE :</dt><dd><ul>
+<li><p>Une réponse indiquant que le modérateur a été supprimé.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Pour la requête POST :</dt><dd><ul>
+<li><dl class="simple">
+<dt>Si la création du modérateur est réussie :</dt><dd><ul>
+<li><p>Une réponse JSON contenant les données sérialisées du nouveau modérateur.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Si la création échoue :</dt><dd><ul>
+<li><p>Une réponse JSON indiquant une erreur avec le message « Not valid ».</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Exemple d’utilisation :
+<a href="#id58"><span class="problematic" id="id59">``</span></a><a href="#id60"><span class="problematic" id="id61">`</span></a>python
+# Exemple d’utilisation de ModeratorUpdate
+class SomeView(APIView):</p>
+<blockquote>
+<div><dl>
+<dt>def some_method(self, request):</dt><dd><p># Exécuter une requête GET pour obtenir les données d’un modérateur
+moderator_update_view = ModeratorUpdate()
+get_response = moderator_update_view.get(request, pk=1)</p>
+<p># Exécuter une requête PUT pour mettre à jour un modérateur
+put_response = moderator_update_view.put(request, pk=1)</p>
+<p># Exécuter une requête DELETE pour supprimer un modérateur
+delete_response = moderator_update_view.delete(request, pk=1)</p>
+<p># Exécuter une requête POST pour créer un nouveau modérateur
+post_response = moderator_update_view.post(request)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id62"><span class="problematic" id="id63">``</span></a><a href="#id64"><span class="problematic" id="id65">`</span></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ModeratorUpdate.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ModeratorUpdate.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ModeratorUpdate.delete" title="Link to this definition"></a></dt>
+<dd><p>Traite la requête DELETE pour supprimer un modérateur.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>pk</cite> : La clé primaire (ID) du modérateur à supprimer.</p>
+<p>Retours :
+- Une réponse indiquant que le modérateur a été supprimé.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ModeratorUpdate.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ModeratorUpdate.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ModeratorUpdate.get" title="Link to this definition"></a></dt>
+<dd><p>Traite la requête GET pour obtenir les données d’un modérateur.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>pk</cite> : La clé primaire (ID) du modérateur à récupérer.</p>
+<p>Retours :
+- Une réponse JSON contenant les données sérialisées du modérateur avec l’ID spécifié.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ModeratorUpdate.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ModeratorUpdate.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ModeratorUpdate.post" title="Link to this definition"></a></dt>
+<dd><p>Traite la requête POST pour créer un nouveau modérateur.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.</p>
+<p>Retours :
+- Si la création du modérateur est réussie :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Une réponse JSON contenant les données sérialisées du nouveau modérateur.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Si la création échoue :</dt><dd><ul>
+<li><p>Une réponse JSON indiquant une erreur avec le message « Not valid ».</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.ModeratorUpdate.put">
+<span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#ModeratorUpdate.put"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.ModeratorUpdate.put" title="Link to this definition"></a></dt>
+<dd><p>Traite la requête PUT pour mettre à jour les données d’un modérateur.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>pk</cite> : La clé primaire (ID) du modérateur à mettre à jour.</p>
+<p>Retours :
+- Une réponse JSON contenant les données sérialisées du modérateur mis à jour.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rchrchArtcl.views.Registerview">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">Registerview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#Registerview"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.Registerview" title="Link to this definition"></a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">APIView</span></code></p>
+<p>View for registering a user.</p>
+<p>This view checks if a user with the given name already exists as a User, Moderateur, or Admin.
+If not, it creates a new User using the provided data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rchrchArtcl.views.Registerview.None">
+<span class="sig-name descname"><span class="pre">None</span></span><a class="headerlink" href="#rchrchArtcl.views.Registerview.None" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rchrchArtcl.views.Registerview.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#Registerview.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.Registerview.post" title="Link to this definition"></a></dt>
+<dd><p>Handles the POST request for user registration.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Lève<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#Registerview.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Handle POST request for user registration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>Request</em>) – The HTTP request object.</p>
+</dd>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>The HTTP response object.</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rchrchArtcl.views.Test">
+<span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">Test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#Test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.Test" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rchrchArtcl.views.Test2">
+<span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">Test2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#Test2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.Test2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rchrchArtcl.views.check_elasticsearch_connection">
+<span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">check_elasticsearch_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#check_elasticsearch_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.check_elasticsearch_connection" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rchrchArtcl.views.delete_article">
+<span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">delete_article</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">article_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#delete_article"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.delete_article" title="Link to this definition"></a></dt>
+<dd><p>Une vue basée sur les fonctions pour supprimer un article d’Elasticsearch.</p>
+<p>Cette vue utilise l’ID de l’article pour supprimer l’article de l’index Elasticsearch.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>article_id</cite> : L’identifiant de l’article dans Elasticsearch.</p>
+<p>Retours :
+- Une réponse JSON indiquant le succès de la suppression de l’article ou une réponse JSON avec un message d’erreur si l’article n’est pas trouvé.</p>
+<p>Méthodes :
+- <cite>delete_article(request, article_id)</cite> : Gère la requête pour supprimer un article depuis Elasticsearch.</p>
+<p>Exemple d’utilisation :
+<a href="#id66"><span class="problematic" id="id67">``</span></a><a href="#id68"><span class="problematic" id="id69">`</span></a>python
+# Exemple d’utilisation de delete_article
+class SomeView(View):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>def some_method(self, request):</dt><dd><p># Appel à delete_article pour supprimer l’article
+article_id = “your_article_id”
+response = delete_article(request, article_id)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id70"><span class="problematic" id="id71">``</span></a><a href="#id72"><span class="problematic" id="id73">`</span></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rchrchArtcl.views.download_from_drive_view">
+<span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">download_from_drive_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drive_url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#download_from_drive_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.download_from_drive_view" title="Link to this definition"></a></dt>
+<dd><p>Une vue basée sur les fonctions pour télécharger des fichiers PDF à partir de Google Drive.</p>
+<p>Cette vue utilise PyDrive pour authentifier et interagir avec Google Drive, puis télécharge les fichiers PDF d’un dossier spécifié.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>drive_url</cite> : L’URL du dossier Google Drive à partir duquel télécharger les fichiers.</p>
+<p>Retours :
+- Une réponse HTTP indiquant le succès du téléchargement des fichiers PDF.</p>
+<p>Méthodes :
+- <cite>download_from_drive_view(request, drive_url)</cite> : Gère la requête pour télécharger des fichiers PDF depuis Google Drive.</p>
+<p>Exemple d’utilisation :
+<a href="#id74"><span class="problematic" id="id75">``</span></a><a href="#id76"><span class="problematic" id="id77">`</span></a>python
+# Exemple d’utilisation de download_from_drive_view
+class SomeView(View):</p>
+<blockquote>
+<div><dl>
+<dt>def some_method(self, request):</dt><dd><p># Appel à download_from_drive_view pour télécharger les fichiers PDF
+drive_url = “<a class="reference external" href="https://drive.google.com/your_folder_url">https://drive.google.com/your_folder_url</a>”
+download_from_drive_view(request, drive_url)</p>
+<p># Traitement de la réponse
+# Votre code ici</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id78"><span class="problematic" id="id79">``</span></a><a href="#id80"><span class="problematic" id="id81">`</span></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rchrchArtcl.views.get_all_articles">
+<span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">get_all_articles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#get_all_articles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.get_all_articles" title="Link to this definition"></a></dt>
+<dd><p>Une vue basée sur les fonctions pour récupérer tous les articles depuis Elasticsearch.</p>
+<p>Cette vue utilise une requête Elasticsearch pour rechercher tous les articles dans l’index spécifié et renvoie les données des articles en tant que réponse JSON.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.</p>
+<p>Retours :
+- Une réponse JSON contenant tous les articles ou une réponse JSON avec un message d’erreur en cas d’échec.</p>
+<p>Méthodes :
+- <cite>get_all_articles(request)</cite> : Gère la requête pour récupérer tous les articles depuis Elasticsearch.</p>
+<p>Exemple d’utilisation :
+<a href="#id82"><span class="problematic" id="id83">``</span></a><a href="#id84"><span class="problematic" id="id85">`</span></a>python
+# Exemple d’utilisation de get_all_articles
+class SomeView(View):</p>
+<blockquote>
+<div><dl>
+<dt>def some_method(self, request):</dt><dd><p># Appel à get_all_articles pour récupérer tous les articles
+response = get_all_articles(request)</p>
+<p># Traitement de la réponse
+# Votre code ici</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id86"><span class="problematic" id="id87">``</span></a><a href="#id88"><span class="problematic" id="id89">`</span></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rchrchArtcl.views.get_article_details">
+<span class="sig-prename descclassname"><span class="pre">rchrchArtcl.views.</span></span><span class="sig-name descname"><span class="pre">get_article_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">article_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rchrchArtcl/views.html#get_article_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rchrchArtcl.views.get_article_details" title="Link to this definition"></a></dt>
+<dd><p>Une vue basée sur les fonctions pour récupérer les détails d’un article à partir d’Elasticsearch.</p>
+<p>Cette vue utilise l’ID de l’article pour interroger Elasticsearch et renvoie les détails de l’article en tant que réponse JSON.</p>
+<p>Paramètres :
+- <cite>request</cite> : L’objet de requête HTTP Django.
+- <cite>article_id</cite> : L’identifiant de l’article dans Elasticsearch.</p>
+<p>Retours :
+- Une réponse JSON contenant les détails de l’article ou une réponse JSON avec un message d’erreur si l’article n’est pas trouvé.</p>
+<p>Méthodes :
+- <cite>get_article_details(request, article_id)</cite> : Gère la requête pour récupérer les détails d’un article depuis Elasticsearch.</p>
+<p>Exemple d’utilisation :
+<a href="#id90"><span class="problematic" id="id91">``</span></a><a href="#id92"><span class="problematic" id="id93">`</span></a>python
+# Exemple d’utilisation de get_article_details
+class SomeView(View):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>def some_method(self, request):</dt><dd><p># Appel à get_article_details pour récupérer les détails de l’article
+article_id = “your_article_id”
+response = get_article_details(request, article_id)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id94"><span class="problematic" id="id95">``</span></a><a href="#id96"><span class="problematic" id="id97">`</span></a></p>
+</dd></dl>
+
+</section>
+<section id="module-rchrchArtcl">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rchrchArtcl" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pied de page">
+        <a href="manage.html" class="btn btn-neutral float-left" title="manage module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Précédent</a>
+        <a href="rchrchArtcl.migrations.html" class="btn btn-neutral float-right" title="rchrchArtcl.migrations package" accesskey="n" rel="next">Suivant <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Droits d'auteur 2023, Rahal , megdad , remil , chouider , menassel.</p>
+  </div>
+
+  Compilé avec <a href="https://www.sphinx-doc.org/">Sphinx</a> en utilisant un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">thème</a>
+    fourni par <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="fr" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rchrchArtcl.multi_column &mdash; Documentation rechrchartc 1.0.0</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=05dadb3a"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/translations.js?v=d99ca74e"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Recherche" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            rechrchartc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Rechercher docs" aria-label="Rechercher docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">rechrchartc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rechrchartc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Code du module</a></li>
+      <li class="breadcrumb-item active">rchrchArtcl.multi_column</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Code source de rchrchArtcl.multi_column</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This is an advanced PyMuPDF utility for detecting multi-column pages.</span>
+<span class="sd">It can be used in a shell script, or its main function can be imported and</span>
+<span class="sd">invoked as descript below.</span>
+
+<span class="sd">Features</span>
+<span class="sd">---------</span>
+<span class="sd">- Identify text belonging to (a variable number of) columns on the page.</span>
+<span class="sd">- Text with different background color is handled separately, allowing for</span>
+<span class="sd">  easier treatment of side remarks, comment boxes, etc.</span>
+<span class="sd">- Uses text block detection capability to identify text blocks and</span>
+<span class="sd">  uses the block bboxes as primary structuring principle.</span>
+<span class="sd">- Supports ignoring footers via a footer margin parameter.</span>
+<span class="sd">- Returns re-created text boundary boxes (integer coordinates), sorted ascending</span>
+<span class="sd">  by the top, then by the left coordinates.</span>
+
+<span class="sd">Restrictions</span>
+<span class="sd">-------------</span>
+<span class="sd">- Only supporting horizontal, left-to-right text</span>
+<span class="sd">- Returns a list of text boundary boxes - not the text itself. The caller is</span>
+<span class="sd">  expected to extract text from within the returned boxes.</span>
+<span class="sd">- Text written above images is ignored altogether (option).</span>
+<span class="sd">- This utility works as expected in most cases. The following situation cannot</span>
+<span class="sd">  be handled correctly:</span>
+<span class="sd">    * overlapping (non-disjoint) text blocks</span>
+<span class="sd">    * image captions are not recognized and are handled like normal text</span>
+
+<span class="sd">Usage</span>
+<span class="sd">------</span>
+<span class="sd">- As a CLI shell command use</span>
+
+<span class="sd">  python multi_column.py input.pdf footer_margin</span>
+
+<span class="sd">  Where footer margin is the height of the bottom stripe to ignore on each page.</span>
+<span class="sd">  This code is intended to be modified according to your need.</span>
+
+<span class="sd">- Use in a Python script as follows:</span>
+
+<span class="sd">  ----------------------------------------------------------------------------------</span>
+<span class="sd">  from multi_column import column_boxes</span>
+
+<span class="sd">  # for each page execute</span>
+<span class="sd">  bboxes = column_boxes(page, footer_margin=50, no_image_text=True)</span>
+
+<span class="sd">  # bboxes is a list of fitz.IRect objects, that are sort ascending by their y0,</span>
+<span class="sd">  # then x0 coordinates. Their text content can be extracted by all PyMuPDF</span>
+<span class="sd">  # get_text() variants, like for instance the following:</span>
+<span class="sd">  for rect in bboxes:</span>
+<span class="sd">      print(page.get_text(clip=rect, sort=True))</span>
+<span class="sd">  ----------------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">fitz</span>
+
+
+<div class="viewcode-block" id="column_boxes">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.multi_column.column_boxes">[docs]</a>
+<span class="k">def</span> <span class="nf">column_boxes</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">footer_margin</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">header_margin</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">no_image_text</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine bboxes which wrap a column.&quot;&quot;&quot;</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">get_drawings</span><span class="p">()</span>
+    <span class="n">bboxes</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># path rectangles</span>
+    <span class="n">path_rects</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># image bboxes</span>
+    <span class="n">img_bboxes</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># bboxes of non-horizontal text</span>
+    <span class="c1"># avoid when expanding horizontal text boxes</span>
+    <span class="n">vert_bboxes</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># compute relevant page area</span>
+    <span class="n">clip</span> <span class="o">=</span> <span class="o">+</span><span class="n">page</span><span class="o">.</span><span class="n">rect</span>
+    <span class="n">clip</span><span class="o">.</span><span class="n">y1</span> <span class="o">-=</span> <span class="n">footer_margin</span>  <span class="c1"># Remove footer area</span>
+    <span class="n">clip</span><span class="o">.</span><span class="n">y0</span> <span class="o">+=</span> <span class="n">header_margin</span>  <span class="c1"># Remove header area</span>
+
+    <span class="k">def</span> <span class="nf">can_extend</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">bb</span><span class="p">,</span> <span class="n">bboxlist</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines whether rectangle &#39;temp&#39; can be extended by &#39;bb&#39;</span>
+<span class="sd">        without intersecting any of the rectangles contained in &#39;bboxlist&#39;.</span>
+
+<span class="sd">        Items of bboxlist may be None if they have been removed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if &#39;temp&#39; has no intersections with items of &#39;bboxlist&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bboxlist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">intersects_bboxes</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">vert_bboxes</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">b</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">b</span> <span class="o">==</span> <span class="n">bb</span> <span class="ow">or</span> <span class="p">(</span><span class="n">temp</span> <span class="o">&amp;</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">is_empty</span>
+            <span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">in_bbox</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return 1-based number if a bbox contains bb, else return 0.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bboxes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">bbox</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">intersects_bboxes</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if a bbox intersects bb, else return False.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="n">bboxes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">bb</span> <span class="o">&amp;</span> <span class="n">bbox</span><span class="p">)</span><span class="o">.</span><span class="n">is_empty</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">extend_right</span><span class="p">(</span><span class="n">bboxes</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">path_bboxes</span><span class="p">,</span> <span class="n">vert_bboxes</span><span class="p">,</span> <span class="n">img_bboxes</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extend a bbox to the right page border.</span>
+
+<span class="sd">        Whenever there is no text to the right of a bbox, enlarge it up</span>
+<span class="sd">        to the right page border.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            bboxes: (list[IRect]) bboxes to check</span>
+<span class="sd">            width: (int) page width</span>
+<span class="sd">            path_bboxes: (list[IRect]) bboxes with a background color</span>
+<span class="sd">            vert_bboxes: (list[IRect]) bboxes with vertical text</span>
+<span class="sd">            img_bboxes: (list[IRect]) bboxes of images</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Potentially modified bboxes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bboxes</span><span class="p">):</span>
+            <span class="c1"># do not extend text with background color</span>
+            <span class="k">if</span> <span class="n">in_bbox</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">path_bboxes</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># do not extend text in images</span>
+            <span class="k">if</span> <span class="n">in_bbox</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">img_bboxes</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># temp extends bb to the right page border</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="o">+</span><span class="n">bb</span>
+            <span class="n">temp</span><span class="o">.</span><span class="n">x1</span> <span class="o">=</span> <span class="n">width</span>
+
+            <span class="c1"># do not cut through colored background or images</span>
+            <span class="k">if</span> <span class="n">intersects_bboxes</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">path_bboxes</span> <span class="o">+</span> <span class="n">vert_bboxes</span> <span class="o">+</span> <span class="n">img_bboxes</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># also, do not intersect other text bboxes</span>
+            <span class="n">check</span> <span class="o">=</span> <span class="n">can_extend</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">bb</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">check</span><span class="p">:</span>
+                <span class="n">bboxes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>  <span class="c1"># replace with enlarged bbox</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bboxes</span> <span class="k">if</span> <span class="n">b</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">clean_nblocks</span><span class="p">(</span><span class="n">nblocks</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do some elementary cleaning.&quot;&quot;&quot;</span>
+
+        <span class="c1"># 1. remove any duplicate blocks.</span>
+        <span class="n">blen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nblocks</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">blen</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">nblocks</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">blen</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">bb1</span> <span class="o">=</span> <span class="n">nblocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">bb0</span> <span class="o">=</span> <span class="n">nblocks</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">bb0</span> <span class="o">==</span> <span class="n">bb1</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">nblocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c1"># 2. repair sequence in special cases:</span>
+        <span class="c1"># consecutive bboxes with almost same bottom value are sorted ascending</span>
+        <span class="c1"># by x-coordinate.</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="n">nblocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">y1</span>  <span class="c1"># first bottom coordinate</span>
+        <span class="n">i0</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># its index</span>
+        <span class="n">i1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># index of last bbox with same bottom</span>
+
+        <span class="c1"># Iterate over bboxes, identifying segments with approx. same bottom value.</span>
+        <span class="c1"># Replace every segment by its sorted version.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nblocks</span><span class="p">)):</span>
+            <span class="n">b1</span> <span class="o">=</span> <span class="n">nblocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">b1</span><span class="o">.</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>  <span class="c1"># different bottom</span>
+                <span class="k">if</span> <span class="n">i1</span> <span class="o">&gt;</span> <span class="n">i0</span><span class="p">:</span>  <span class="c1"># segment length &gt; 1? Sort it!</span>
+                    <span class="n">nblocks</span><span class="p">[</span><span class="n">i0</span> <span class="p">:</span> <span class="n">i1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                        <span class="n">nblocks</span><span class="p">[</span><span class="n">i0</span> <span class="p">:</span> <span class="n">i1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">x0</span>
+                    <span class="p">)</span>
+                <span class="n">y1</span> <span class="o">=</span> <span class="n">b1</span><span class="o">.</span><span class="n">y1</span>  <span class="c1"># store new bottom value</span>
+                <span class="n">i0</span> <span class="o">=</span> <span class="n">i</span>  <span class="c1"># store its start index</span>
+            <span class="n">i1</span> <span class="o">=</span> <span class="n">i</span>  <span class="c1"># store current index</span>
+        <span class="k">if</span> <span class="n">i1</span> <span class="o">&gt;</span> <span class="n">i0</span><span class="p">:</span>  <span class="c1"># segment waiting to be sorted</span>
+            <span class="n">nblocks</span><span class="p">[</span><span class="n">i0</span> <span class="p">:</span> <span class="n">i1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">nblocks</span><span class="p">[</span><span class="n">i0</span> <span class="p">:</span> <span class="n">i1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">x0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nblocks</span>
+
+    <span class="c1"># extract vector graphics</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+        <span class="n">path_rects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;rect&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">irect</span><span class="p">)</span>
+    <span class="n">path_bboxes</span> <span class="o">=</span> <span class="n">path_rects</span>
+
+    <span class="c1"># sort path bboxes by ascending top, then left coordinates</span>
+    <span class="n">path_bboxes</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">y0</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">x0</span><span class="p">))</span>
+
+    <span class="c1"># bboxes of images on page, no need to sort them</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">get_images</span><span class="p">():</span>
+        <span class="n">img_bboxes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">get_image_rects</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="c1"># blocks of text on page</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span>
+        <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+        <span class="n">flags</span><span class="o">=</span><span class="n">fitz</span><span class="o">.</span><span class="n">TEXTFLAGS_TEXT</span><span class="p">,</span>
+        <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span>
+    <span class="p">)[</span><span class="s2">&quot;blocks&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Make block rectangles, ignoring non-horizontal text</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">:</span>
+        <span class="n">bbox</span> <span class="o">=</span> <span class="n">fitz</span><span class="o">.</span><span class="n">IRect</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="s2">&quot;bbox&quot;</span><span class="p">])</span>  <span class="c1"># bbox of the block</span>
+
+        <span class="c1"># ignore text written upon images</span>
+        <span class="k">if</span> <span class="n">no_image_text</span> <span class="ow">and</span> <span class="n">in_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">img_bboxes</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># confirm first line to be horizontal</span>
+        <span class="n">line0</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="s2">&quot;lines&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># get first line</span>
+        <span class="k">if</span> <span class="n">line0</span><span class="p">[</span><span class="s2">&quot;dir&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>  <span class="c1"># only accept horizontal text</span>
+            <span class="n">vert_bboxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bbox</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="n">srect</span> <span class="o">=</span> <span class="n">fitz</span><span class="o">.</span><span class="n">EMPTY_IRECT</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">b</span><span class="p">[</span><span class="s2">&quot;lines&quot;</span><span class="p">]:</span>
+            <span class="n">lbbox</span> <span class="o">=</span> <span class="n">fitz</span><span class="o">.</span><span class="n">IRect</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;bbox&quot;</span><span class="p">])</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">s</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">line</span><span class="p">[</span><span class="s2">&quot;spans&quot;</span><span class="p">]])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">srect</span> <span class="o">|=</span> <span class="n">lbbox</span>
+        <span class="n">bbox</span> <span class="o">=</span> <span class="o">+</span><span class="n">srect</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bbox</span><span class="o">.</span><span class="n">is_empty</span><span class="p">:</span>
+            <span class="n">bboxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bbox</span><span class="p">)</span>
+
+    <span class="c1"># Sort text bboxes by ascending background, top, then left coordinates</span>
+    <span class="n">bboxes</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">in_bbox</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">path_bboxes</span><span class="p">),</span> <span class="n">k</span><span class="o">.</span><span class="n">y0</span><span class="p">,</span> <span class="n">k</span><span class="o">.</span><span class="n">x0</span><span class="p">))</span>
+
+    <span class="c1"># Extend bboxes to the right where possible</span>
+    <span class="n">bboxes</span> <span class="o">=</span> <span class="n">extend_right</span><span class="p">(</span>
+        <span class="n">bboxes</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">),</span> <span class="n">path_bboxes</span><span class="p">,</span> <span class="n">vert_bboxes</span><span class="p">,</span> <span class="n">img_bboxes</span>
+    <span class="p">)</span>
+
+    <span class="c1"># immediately return of no text found</span>
+    <span class="k">if</span> <span class="n">bboxes</span> <span class="o">==</span> <span class="p">[]:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="c1"># --------------------------------------------------------------------</span>
+    <span class="c1"># Join bboxes to establish some column structure</span>
+    <span class="c1"># --------------------------------------------------------------------</span>
+    <span class="c1"># the final block bboxes on page</span>
+    <span class="n">nblocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">bboxes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>  <span class="c1"># pre-fill with first bbox</span>
+    <span class="n">bboxes</span> <span class="o">=</span> <span class="n">bboxes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># remaining old bboxes</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bboxes</span><span class="p">):</span>  <span class="c1"># iterate old bboxes</span>
+        <span class="n">check</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># indicates unwanted joins</span>
+
+        <span class="c1"># check if bb can extend one of the new blocks</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nblocks</span><span class="p">)):</span>
+            <span class="n">nbb</span> <span class="o">=</span> <span class="n">nblocks</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>  <span class="c1"># a new block</span>
+
+            <span class="c1"># never join across columns</span>
+            <span class="k">if</span> <span class="n">bb</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">nbb</span><span class="o">.</span><span class="n">x1</span> <span class="o">&lt;</span> <span class="n">bb</span><span class="o">.</span><span class="n">x0</span> <span class="ow">or</span> <span class="n">bb</span><span class="o">.</span><span class="n">x1</span> <span class="o">&lt;</span> <span class="n">nbb</span><span class="o">.</span><span class="n">x0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># never join across different background colors</span>
+            <span class="k">if</span> <span class="n">in_bbox</span><span class="p">(</span><span class="n">nbb</span><span class="p">,</span> <span class="n">path_bboxes</span><span class="p">)</span> <span class="o">!=</span> <span class="n">in_bbox</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">path_bboxes</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">bb</span> <span class="o">|</span> <span class="n">nbb</span>  <span class="c1"># temporary extension of new block</span>
+            <span class="n">check</span> <span class="o">=</span> <span class="n">can_extend</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">nbb</span><span class="p">,</span> <span class="n">nblocks</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">check</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">check</span><span class="p">:</span>  <span class="c1"># bb cannot be used to extend any of the new bboxes</span>
+            <span class="n">nblocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bb</span><span class="p">)</span>  <span class="c1"># so add it to the list</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nblocks</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># index of it</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">nblocks</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>  <span class="c1"># new bbox added</span>
+
+        <span class="c1"># check if some remaining bbox is contained in temp</span>
+        <span class="n">check</span> <span class="o">=</span> <span class="n">can_extend</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">bb</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">nblocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bb</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nblocks</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>
+        <span class="n">bboxes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># do some elementary cleaning</span>
+    <span class="n">nblocks</span> <span class="o">=</span> <span class="n">clean_nblocks</span><span class="p">(</span><span class="n">nblocks</span><span class="p">)</span>
+
+    <span class="c1"># return identified text bboxes</span>
+    <span class="k">return</span> <span class="n">nblocks</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Only for debugging purposes, currently.</span>
+
+<span class="sd">    Draw red borders around the returned text bboxes and insert</span>
+<span class="sd">    the bbox number.</span>
+<span class="sd">    Then save the file under the name &quot;input-blocks.pdf&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># get the file name</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># check if footer margin is given</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">footer_margin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># use default vaue</span>
+        <span class="n">footer_margin</span> <span class="o">=</span> <span class="mi">50</span>
+
+    <span class="c1"># check if header margin is given</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">header_margin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># use default vaue</span>
+        <span class="n">header_margin</span> <span class="o">=</span> <span class="mi">50</span>
+
+    <span class="c1"># open document</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">fitz</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="c1"># iterate over the pages</span>
+    <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">:</span>
+        <span class="c1"># remove any geometry issues</span>
+        <span class="n">page</span><span class="o">.</span><span class="n">wrap_contents</span><span class="p">()</span>
+
+        <span class="c1"># get the text bboxes</span>
+        <span class="n">bboxes</span> <span class="o">=</span> <span class="n">column_boxes</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">footer_margin</span><span class="o">=</span><span class="n">footer_margin</span><span class="p">,</span> <span class="n">header_margin</span><span class="o">=</span><span class="n">header_margin</span><span class="p">)</span>
+
+        <span class="c1"># prepare a canvas to draw rectangles and text</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">new_shape</span><span class="p">()</span>
+
+        <span class="c1"># iterate over the bboxes</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rect</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bboxes</span><span class="p">):</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">draw_rect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>  <span class="c1"># draw a border</span>
+
+            <span class="c1"># write sequence number</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">insert_text</span><span class="p">(</span><span class="n">rect</span><span class="o">.</span><span class="n">tl</span> <span class="o">+</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="n">fitz</span><span class="o">.</span><span class="n">pdfcolor</span><span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">])</span>
+
+        <span class="c1"># finish drawing / text with color red</span>
+        <span class="n">shape</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">fitz</span><span class="o">.</span><span class="n">pdfcolor</span><span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">])</span>
+        <span class="n">shape</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>  <span class="c1"># store to the page</span>
+
+    <span class="c1"># save document with text bboxes</span>
+    <span class="n">doc</span><span class="o">.</span><span class="n">ez_save</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;-blocks.pdf&quot;</span><span class="p">))</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Droits d'auteur 2023, Rahal , megdad , remil , chouider , menassel.</p>
+  </div>
+
+  Compilé avec <a href="https://www.sphinx-doc.org/">Sphinx</a> en utilisant un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">thème</a>
+    fourni par <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

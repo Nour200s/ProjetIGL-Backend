@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="fr" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rchrchArtcl.views &mdash; Documentation rechrchartc 1.0.0</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=05dadb3a"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/translations.js?v=d99ca74e"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Recherche" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            rechrchartc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Rechercher docs" aria-label="Rechercher docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">rechrchartc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rechrchartc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Code du module</a></li>
+      <li class="breadcrumb-item active">rchrchArtcl.views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Code source de rchrchArtcl.views</h1><div class="highlight"><pre>
+<span></span><span class="c1">#import termios</span>
+<span class="kn">from</span> <span class="nn">rest_framework.views</span> <span class="kn">import</span> <span class="n">APIView</span> 
+<span class="kn">from</span> <span class="nn">.api.serializers</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">rest_framework.response</span> <span class="kn">import</span> <span class="n">Response</span> 
+
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">jwt</span> <span class="o">,</span> <span class="nn">datetime</span>  
+<span class="kn">from</span> <span class="nn">oauth2client.service_account</span> <span class="kn">import</span> <span class="n">ServiceAccountCredentials</span>
+
+<span class="kn">from</span> <span class="nn">rest_framework</span> <span class="kn">import</span> <span class="n">status</span>
+<span class="kn">from</span> <span class="nn">.api</span> <span class="kn">import</span> <span class="n">serializers</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="kn">import</span> <span class="nn">PyPDF2</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">connections</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
+<span class="c1">#from elasticsearch_dsl import Q, Date, Document, Search,Term ,Text,Range</span>
+
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.test</span> <span class="kn">import</span> <span class="n">TestCase</span><span class="p">,</span> <span class="n">Client</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pydrive.auth</span> <span class="kn">import</span> <span class="n">GoogleAuth</span>
+<span class="kn">from</span> <span class="nn">pydrive.drive</span> <span class="kn">import</span> <span class="n">GoogleDrive</span>
+<span class="c1">#FOR TEXT EXTRACTION</span>
+<span class="kn">import</span> <span class="nn">fitz</span> 
+<span class="kn">from</span> <span class="nn">.multi_column</span> <span class="kn">import</span> <span class="n">column_boxes</span>
+<span class="kn">import</span> <span class="nn">spacy</span> 
+<span class="kn">from</span> <span class="nn">elasticsearch</span> <span class="kn">import</span> <span class="n">Elasticsearch</span>
+<span class="kn">from</span> <span class="nn">elasticsearch.exceptions</span> <span class="kn">import</span> <span class="ne">ConnectionError</span>
+<span class="kn">from</span> <span class="nn">elasticsearch.exceptions</span> <span class="kn">import</span> <span class="n">NotFoundError</span>
+
+<div class="viewcode-block" id="Registerview">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.Registerview">[docs]</a>
+<span class="k">class</span> <span class="nc">Registerview</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View for registering a user.</span>
+
+<span class="sd">    This view checks if a user with the given name already exists as a User, Moderateur, or Admin.</span>
+<span class="sd">    If not, it creates a new User using the provided data.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        None</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">        post(request): Handles the POST request for user registration.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Registerview.post">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.Registerview.post">[docs]</a>
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span> <span class="p">,</span> <span class="n">request</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle POST request for user registration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request (Request): The HTTP request object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Response: The HTTP response object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">moderateur</span> <span class="o">=</span> <span class="n">Moderateurs</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">admin</span> <span class="o">=</span> <span class="n">Admins</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">moderateur</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">admin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="n">serializer</span> <span class="o">=</span> <span class="n">UserSerializer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">serializer</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">raise_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">serializer</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">serializer</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">({</span>
+                <span class="s2">&quot;ERROR&quot;</span> <span class="p">:</span> <span class="s2">&quot;Not valid&quot;</span>
+            <span class="p">})</span></div>
+</div>
+
+<div class="viewcode-block" id="Loginview">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.Loginview">[docs]</a>
+<span class="k">class</span> <span class="nc">Loginview</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">     A class-based view for handling user login.</span>
+
+<span class="sd">    This view authenticates users, moderators, and administrators based on the provided name and password.</span>
+<span class="sd">    If the authentication is successful, it returns a token and information about the type of visitor.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - `request`: The Django HTTP request object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - If authentication is successful:</span>
+<span class="sd">        - A JSON response containing:</span>
+<span class="sd">            - &quot;token&quot;: The user&#39;s name (used as a token for simplicity).</span>
+<span class="sd">            - &quot;visitor&quot;: The type of visitor (user, moderator, or administrator).</span>
+<span class="sd">            - &quot;Validation&quot;: &quot;valid&quot;</span>
+<span class="sd">    - If authentication fails:</span>
+<span class="sd">        - A JSON response with &quot;Validation&quot;: &quot;Not valid&quot;.</span>
+
+<span class="sd">    Example Usage:</span>
+<span class="sd">    ```python</span>
+<span class="sd">    # Example usage of Loginview</span>
+<span class="sd">    class SomeView(APIView):</span>
+<span class="sd">        def some_method(self, request):</span>
+<span class="sd">            name = request.data[&quot;name&quot;]</span>
+<span class="sd">            password = request.data[&quot;password&quot;]</span>
+
+<span class="sd">            # Calling Loginview</span>
+<span class="sd">            login_view = Loginview()</span>
+<span class="sd">            response = login_view.post(request)</span>
+
+<span class="sd">            # Process the response</span>
+<span class="sd">            if response.data[&quot;Validation&quot;] == &quot;valid&quot;:</span>
+<span class="sd">                # Authentication successful</span>
+<span class="sd">                token = response.data[&quot;token&quot;]</span>
+<span class="sd">                visitor_type = response.data[&quot;visitor&quot;]</span>
+
+<span class="sd">            else:</span>
+<span class="sd">                # Authentication failed</span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Loginview.post">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.Loginview.post">[docs]</a>
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span> <span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles the POST request for user login.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - `request`: The Django HTTP request object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        - If authentication is successful:</span>
+<span class="sd">            - A JSON response containing:</span>
+<span class="sd">                - &quot;token&quot;: The user&#39;s name (used as a token for simplicity).</span>
+<span class="sd">                - &quot;visitor&quot;: The type of visitor (user, moderator, or administrator).</span>
+<span class="sd">                - &quot;Validation&quot;: &quot;valid&quot;</span>
+<span class="sd">        - If authentication fails:</span>
+<span class="sd">            - A JSON response with &quot;Validation&quot;: &quot;Not valid&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;password&quot;</span><span class="p">]</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">moderateur</span> <span class="o">=</span> <span class="n">Moderateurs</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">admin</span> <span class="o">=</span> <span class="n">Admins</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">visitor</span> <span class="o">=</span> <span class="s2">&quot;Not Found&quot;</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span>  <span class="n">user</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="n">password</span> <span class="p">:</span>
+                <span class="n">visitor</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span>
+        <span class="k">elif</span> <span class="n">moderateur</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="k">if</span>  <span class="n">moderateur</span><span class="o">.</span><span class="n">password</span><span class="o">==</span><span class="n">password</span><span class="p">:</span>
+                <span class="n">visitor</span> <span class="o">=</span> <span class="s2">&quot;moderateur&quot;</span>
+        <span class="k">elif</span> <span class="n">admin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="k">if</span>  <span class="n">admin</span><span class="o">.</span><span class="n">password</span><span class="o">==</span><span class="n">password</span><span class="p">:</span>
+                <span class="n">visitor</span> <span class="o">=</span> <span class="s2">&quot;administrateur&quot;</span>
+        <span class="k">if</span> <span class="n">visitor</span> <span class="o">!=</span> <span class="s2">&quot;Not Found&quot;</span><span class="p">:</span>
+            <span class="n">reponse</span> <span class="o">=</span> <span class="n">Response</span><span class="p">()</span> 
+            <span class="n">reponse</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;token&quot;</span> <span class="p">:</span> <span class="n">name</span><span class="p">,</span> 
+                <span class="s2">&quot;visitor&quot;</span> <span class="p">:</span> <span class="n">visitor</span> <span class="p">,</span> 
+                <span class="s2">&quot;Validation&quot;</span> <span class="p">:</span> <span class="s2">&quot;valid&quot;</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="n">reponse</span> 
+        <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">Response</span><span class="p">({</span>
+            <span class="s2">&quot;Validation&quot;</span> <span class="p">:</span> <span class="s2">&quot;Not valid&quot;</span>
+        <span class="p">})</span></div>
+</div>
+
+    
+
+<div class="viewcode-block" id="ModeratorList">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ModeratorList">[docs]</a>
+<span class="k">class</span> <span class="nc">ModeratorList</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class-based view for retrieving a list of moderators.</span>
+
+<span class="sd">    This view handles the GET request and returns a serialized list of all moderators.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - `request`: The Django HTTP request object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - A JSON response containing the serialized data of all moderators.</span>
+
+<span class="sd">    Example Usage:</span>
+<span class="sd">    ```python</span>
+<span class="sd">    # Example usage of ModeratorList</span>
+<span class="sd">    class SomeView(APIView):</span>
+<span class="sd">        def some_method(self, request):</span>
+<span class="sd">            # Calling ModeratorList</span>
+<span class="sd">            moderator_list_view = ModeratorList()</span>
+<span class="sd">            response = moderator_list_view.get(request)</span>
+
+<span class="sd">            # Process the response</span>
+<span class="sd">            moderators_data = response.data</span>
+<span class="sd">           </span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ModeratorList.get">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ModeratorList.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">request</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles the GET request for retrieving a list of moderators.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - `request`: The Django HTTP request object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        - A JSON response containing the serialized data of all moderators.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mods</span> <span class="o">=</span> <span class="n">Moderateurs</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">ModerateursSerializer</span><span class="p">(</span><span class="n">mods</span><span class="p">,</span><span class="n">many</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">serializer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+</div>
+
+    
+<div class="viewcode-block" id="ModeratorUpdate">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ModeratorUpdate">[docs]</a>
+<span class="k">class</span> <span class="nc">ModeratorUpdate</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Une vue basée sur les classes pour la mise à jour des modérateurs.</span>
+
+<span class="sd">    Cette vue prend en charge les requêtes GET, PUT, DELETE et POST pour la mise à jour et la manipulation des modérateurs.</span>
+
+<span class="sd">    Paramètres :</span>
+<span class="sd">    - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">    - `pk` : La clé primaire (ID) du modérateur à manipuler.</span>
+
+<span class="sd">    Retours :</span>
+<span class="sd">    - Pour la requête GET :</span>
+<span class="sd">        - Une réponse JSON contenant les données sérialisées du modérateur avec l&#39;ID spécifié.</span>
+<span class="sd">    - Pour la requête PUT :</span>
+<span class="sd">        - Une réponse JSON contenant les données sérialisées du modérateur mis à jour.</span>
+<span class="sd">    - Pour la requête DELETE :</span>
+<span class="sd">        - Une réponse indiquant que le modérateur a été supprimé.</span>
+<span class="sd">    - Pour la requête POST :</span>
+<span class="sd">        - Si la création du modérateur est réussie :</span>
+<span class="sd">            - Une réponse JSON contenant les données sérialisées du nouveau modérateur.</span>
+<span class="sd">        - Si la création échoue :</span>
+<span class="sd">            - Une réponse JSON indiquant une erreur avec le message &quot;Not valid&quot;.</span>
+
+<span class="sd">    Exemple d&#39;utilisation :</span>
+<span class="sd">    ```python</span>
+<span class="sd">    # Exemple d&#39;utilisation de ModeratorUpdate</span>
+<span class="sd">    class SomeView(APIView):</span>
+<span class="sd">        def some_method(self, request):</span>
+<span class="sd">            # Exécuter une requête GET pour obtenir les données d&#39;un modérateur</span>
+<span class="sd">            moderator_update_view = ModeratorUpdate()</span>
+<span class="sd">            get_response = moderator_update_view.get(request, pk=1)</span>
+
+<span class="sd">            # Exécuter une requête PUT pour mettre à jour un modérateur</span>
+<span class="sd">            put_response = moderator_update_view.put(request, pk=1)</span>
+
+<span class="sd">            # Exécuter une requête DELETE pour supprimer un modérateur</span>
+<span class="sd">            delete_response = moderator_update_view.delete(request, pk=1)</span>
+
+<span class="sd">            # Exécuter une requête POST pour créer un nouveau modérateur</span>
+<span class="sd">            post_response = moderator_update_view.post(request)</span>
+
+<span class="sd">           </span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ModeratorUpdate.get">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ModeratorUpdate.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">request</span><span class="p">,</span><span class="n">pk</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Traite la requête GET pour obtenir les données d&#39;un modérateur.</span>
+
+<span class="sd">        Paramètres :</span>
+<span class="sd">        - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">        - `pk` : La clé primaire (ID) du modérateur à récupérer.</span>
+
+<span class="sd">        Retours :</span>
+<span class="sd">        - Une réponse JSON contenant les données sérialisées du modérateur avec l&#39;ID spécifié.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mods</span> <span class="o">=</span> <span class="n">Moderateurs</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">ModerateursSerializer</span><span class="p">(</span><span class="n">mods</span><span class="p">,</span><span class="n">many</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">serializer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModeratorUpdate.put">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ModeratorUpdate.put">[docs]</a>
+    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">request</span><span class="p">,</span><span class="n">pk</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Traite la requête PUT pour mettre à jour les données d&#39;un modérateur.</span>
+
+<span class="sd">        Paramètres :</span>
+<span class="sd">        - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">        - `pk` : La clé primaire (ID) du modérateur à mettre à jour.</span>
+
+<span class="sd">        Retours :</span>
+<span class="sd">        - Une réponse JSON contenant les données sérialisées du modérateur mis à jour.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">Moderateurs</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">ModerateursSerializer</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">mod</span> <span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">serializer</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">serializer</span><span class="o">.</span><span class="n">save</span><span class="p">()</span> 
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">serializer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModeratorUpdate.delete">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ModeratorUpdate.delete">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">request</span><span class="p">,</span><span class="n">pk</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Traite la requête DELETE pour supprimer un modérateur.</span>
+
+<span class="sd">        Paramètres :</span>
+<span class="sd">        - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">        - `pk` : La clé primaire (ID) du modérateur à supprimer.</span>
+
+<span class="sd">        Retours :</span>
+<span class="sd">        - Une réponse indiquant que le modérateur a été supprimé.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">Moderateurs</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="s2">&quot;Moderateur supprimé&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModeratorUpdate.post">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ModeratorUpdate.post">[docs]</a>
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">request</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Traite la requête POST pour créer un nouveau modérateur.</span>
+
+<span class="sd">        Paramètres :</span>
+<span class="sd">        - `request` : L&#39;objet de requête HTTP Django.</span>
+
+<span class="sd">        Retours :</span>
+<span class="sd">        - Si la création du modérateur est réussie :</span>
+<span class="sd">            - Une réponse JSON contenant les données sérialisées du nouveau modérateur.</span>
+<span class="sd">        - Si la création échoue :</span>
+<span class="sd">            - Une réponse JSON indiquant une erreur avec le message &quot;Not valid&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">moderateur</span> <span class="o">=</span> <span class="n">Moderateurs</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">admin</span> <span class="o">=</span> <span class="n">Admins</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">moderateur</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">admin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="n">newmod</span> <span class="o">=</span> <span class="n">Moderateurs</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+                <span class="n">password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;password&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">serializer</span> <span class="o">=</span> <span class="n">ModerateursSerializer</span><span class="p">(</span><span class="n">newmod</span> <span class="p">,</span><span class="n">many</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">serializer</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">({</span>
+                <span class="s2">&quot;ERROR&quot;</span> <span class="p">:</span> <span class="s2">&quot;Not valid&quot;</span>
+            <span class="p">})</span></div>
+</div>
+
+
+
+
+<div class="viewcode-block" id="ArticleFavoris">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ArticleFavoris">[docs]</a>
+<span class="k">class</span> <span class="nc">ArticleFavoris</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Une vue basée sur les classes pour gérer les articles favoris d&#39;un utilisateur.</span>
+
+<span class="sd">    Cette vue prend en charge les requêtes POST et DELETE pour ajouter et supprimer des articles des favoris d&#39;un utilisateur.</span>
+
+<span class="sd">    Paramètres :</span>
+<span class="sd">    - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">    - `Userid` : L&#39;identifiant de l&#39;utilisateur.</span>
+<span class="sd">    - `Artid` : L&#39;identifiant de l&#39;article.</span>
+
+<span class="sd">    Retours :</span>
+<span class="sd">    - Une réponse JSON indiquant la validation de l&#39;opération.</span>
+
+<span class="sd">    Méthodes :</span>
+<span class="sd">    - `post(request, Userid, Artid)` : Gère la requête POST pour ajouter un article aux favoris d&#39;un utilisateur.</span>
+<span class="sd">    - `delete(request, Userid, Artid)` : Gère la requête DELETE pour supprimer un article des favoris d&#39;un utilisateur.</span>
+
+<span class="sd">    Exemple d&#39;utilisation :</span>
+<span class="sd">    ```python</span>
+<span class="sd">    # Exemple d&#39;utilisation de ArticleFavoris</span>
+<span class="sd">    class SomeView(APIView):</span>
+<span class="sd">        def some_method(self, request, Userid, Artid):</span>
+<span class="sd">            # Ajout d&#39;un article aux favoris</span>
+<span class="sd">            article_favoris_view = ArticleFavoris()</span>
+<span class="sd">            response_add = article_favoris_view.post(request, Userid, Artid)</span>
+
+<span class="sd">            # Suppression d&#39;un article des favoris</span>
+<span class="sd">            response_delete = article_favoris_view.delete(request, Userid, Artid)</span>
+
+<span class="sd">           </span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ArticleFavoris.post">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ArticleFavoris.post">[docs]</a>
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span> <span class="p">,</span> <span class="n">request</span><span class="p">,</span><span class="n">Userid</span><span class="p">,</span><span class="n">Artid</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gère la requête POST pour ajouter un article aux favoris d&#39;un utilisateur.</span>
+
+<span class="sd">        Paramètres :</span>
+<span class="sd">        - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">        - `Userid` : L&#39;identifiant de l&#39;utilisateur.</span>
+<span class="sd">        - `Artid` : L&#39;identifiant de l&#39;article.</span>
+
+<span class="sd">        Retours :</span>
+<span class="sd">        - Une réponse JSON indiquant la validation de l&#39;opération.</span>
+<span class="sd">        &quot;&quot;&quot;</span> 
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">Userid</span><span class="p">)</span>
+        <span class="n">user</span><span class="o">.</span><span class="n">favoris</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Artid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">({</span>
+                <span class="s2">&quot;Validation&quot;</span> <span class="p">:</span> <span class="s2">&quot;valid&quot;</span> <span class="p">,</span> 
+            <span class="p">})</span></div>
+
+<div class="viewcode-block" id="ArticleFavoris.delete">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ArticleFavoris.delete">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span> <span class="p">,</span> <span class="n">request</span><span class="p">,</span><span class="n">Userid</span><span class="p">,</span><span class="n">Artid</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gère la requête DELETE pour supprimer un article des favoris d&#39;un utilisateur.</span>
+
+<span class="sd">        Paramètres :</span>
+<span class="sd">        - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">        - `Userid` : L&#39;identifiant de l&#39;utilisateur.</span>
+<span class="sd">        - `Artid` : L&#39;identifiant de l&#39;article.</span>
+
+<span class="sd">        Retours :</span>
+<span class="sd">        - Une réponse JSON indiquant le statut de la suppression de l&#39;item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">=</span><span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">Userid</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">Article</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;msg&quot;</span> <span class="p">:</span> <span class="s2">&quot;Article not found&quot;</span><span class="p">}</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">favoris</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">Artid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s2">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;success&quot;</span><span class="p">,</span><span class="s2">&quot;data&quot;</span><span class="p">:</span><span class="s2">&quot;item Deleted&quot;</span> <span class="p">})</span>  </div>
+</div>
+
+    
+
+
+<div class="viewcode-block" id="ArticleViewset">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ArticleViewset">[docs]</a>
+<span class="k">class</span> <span class="nc">ArticleViewset</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Une vue basée sur les classes pour effectuer des opérations CRUD sur les articles.</span>
+
+<span class="sd">    Cette vue prend en charge les requêtes POST, DELETE, PATCH et GET pour créer, supprimer, mettre à jour et récupérer des articles.</span>
+
+<span class="sd">    Paramètres :</span>
+<span class="sd">    - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">    - `id` : L&#39;identifiant de l&#39;article.</span>
+
+<span class="sd">    Retours :</span>
+<span class="sd">    - Pour la requête POST :</span>
+<span class="sd">        - Une réponse JSON indiquant le statut de l&#39;opération et les données de l&#39;article créé.</span>
+<span class="sd">    - Pour la requête DELETE :</span>
+<span class="sd">        - Une réponse JSON indiquant le statut de la suppression de l&#39;article.</span>
+<span class="sd">    - Pour la requête PATCH :</span>
+<span class="sd">        - Une réponse JSON indiquant le statut de la mise à jour de l&#39;article.</span>
+<span class="sd">    - Pour la requête GET :</span>
+<span class="sd">        - Une réponse JSON contenant la liste de tous les articles.</span>
+
+<span class="sd">    Méthodes :</span>
+<span class="sd">    - `post(request)` : Gère la requête POST pour créer un nouvel article.</span>
+<span class="sd">    - `delete(request, id)` : Gère la requête DELETE pour supprimer un article.</span>
+<span class="sd">    - `patch(request, id)` : Gère la requête PATCH pour mettre à jour un article.</span>
+<span class="sd">    - `get(request)` : Gère la requête GET pour récupérer tous les articles.</span>
+
+<span class="sd">    Exemple d&#39;utilisation :</span>
+<span class="sd">    ```python</span>
+<span class="sd">    # Exemple d&#39;utilisation de ArticleViewset</span>
+<span class="sd">    class SomeView(APIView):</span>
+<span class="sd">        def some_method(self, request):</span>
+<span class="sd">            # Création d&#39;un nouvel article</span>
+<span class="sd">            article_viewset = ArticleViewset()</span>
+<span class="sd">            response_post = article_viewset.post(request)</span>
+
+<span class="sd">            # Suppression d&#39;un article</span>
+<span class="sd">            response_delete = article_viewset.delete(request, id=1)</span>
+
+<span class="sd">            # Mise à jour d&#39;un article</span>
+<span class="sd">            response_patch = article_viewset.patch(request, id=1)</span>
+
+<span class="sd">            # Récupération de tous les articles</span>
+<span class="sd">            response_get = article_viewset.get(request)</span>
+<span class="sd">         </span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+   
+    <span class="c1"># Post </span>
+<div class="viewcode-block" id="ArticleViewset.post">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ArticleViewset.post">[docs]</a>
+    <span class="k">def</span> <span class="nf">post</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">request</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gère la requête POST pour créer un nouvel article.</span>
+
+<span class="sd">        Paramètres :</span>
+<span class="sd">        - `request` : L&#39;objet de requête HTTP Django.</span>
+
+<span class="sd">        Retours :</span>
+<span class="sd">        - Une réponse JSON indiquant le statut de l&#39;opération et les données de l&#39;article créé.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+       
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">ArticleSerializer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">serializer</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">serializer</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s2">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;success&quot;</span><span class="p">,</span><span class="s2">&quot;data&quot;</span><span class="p">:</span><span class="n">serializer</span><span class="o">.</span><span class="n">data</span><span class="p">},</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s2">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;error&quot;</span><span class="p">,</span><span class="s2">&quot;data&quot;</span><span class="p">:</span><span class="n">serializer</span><span class="o">.</span><span class="n">error</span><span class="p">},</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">)</span></div>
+
+    <span class="c1">#Delete </span>
+<div class="viewcode-block" id="ArticleViewset.delete">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ArticleViewset.delete">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">request</span><span class="p">,</span><span class="nb">id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gère la requête DELETE pour supprimer un article.</span>
+
+<span class="sd">        Paramètres :</span>
+<span class="sd">        - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">        - `id` : L&#39;identifiant de l&#39;article.</span>
+
+<span class="sd">        Retours :</span>
+<span class="sd">        - Une réponse JSON indiquant le statut de la suppression de l&#39;article.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">=</span><span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">Article</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;msg&quot;</span> <span class="p">:</span> <span class="s2">&quot;Article not found&quot;</span><span class="p">}</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>  
+        <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s2">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;success&quot;</span><span class="p">,</span><span class="s2">&quot;data&quot;</span><span class="p">:</span><span class="s2">&quot;item Deleted&quot;</span> <span class="p">})</span>  </div>
+
+    
+    <span class="c1">#update  </span>
+<div class="viewcode-block" id="ArticleViewset.patch">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ArticleViewset.patch">[docs]</a>
+    <span class="k">def</span> <span class="nf">patch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gère la requête PATCH pour mettre à jour un article.</span>
+
+<span class="sd">        Paramètres :</span>
+<span class="sd">        - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">        - `id` : L&#39;identifiant de l&#39;article.</span>
+
+<span class="sd">        Retours :</span>
+<span class="sd">        - Une réponse JSON indiquant le statut de la mise à jour de l&#39;article.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">my_model</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">ArticleSerializer</span><span class="p">(</span><span class="n">my_model</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">serializer</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">serializer</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">serializer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">serializer</span><span class="o">.</span><span class="n">errors</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">)</span></div>
+
+    <span class="c1">#Get all article </span>
+<div class="viewcode-block" id="ArticleViewset.get">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.ArticleViewset.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">request</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gère la requête GET pour récupérer tous les articles.</span>
+
+<span class="sd">        Paramètres :</span>
+<span class="sd">        - `request` : L&#39;objet de requête HTTP Django.</span>
+
+<span class="sd">        Retours :</span>
+<span class="sd">        - Une réponse JSON contenant la liste de tous les articles.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">articales</span> <span class="o">=</span>   <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> 
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">articales</span><span class="p">)</span></div>
+</div>
+
+    
+
+
+
+
+<span class="c1"># c&#39;est la fonction d&#39;upload qui fait l&#39;upload des fichiers pdf a partir d&#39;in url de  google drive qui contient les pdf et puis les met dans le repertoire Uploaded files pour qu&#39;on puisse les utiliser dans l&#39;extraction apres envoyer le repertoire a la base des données de elastic search</span>
+<span class="c1"># j&#39;ai utiliser google drive API et Service account pour permettre a n&#39;importe quel user d&#39;uploader </span>
+  
+<div class="viewcode-block" id="download_from_drive_view">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.download_from_drive_view">[docs]</a>
+<span class="k">def</span> <span class="nf">download_from_drive_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="n">drive_url</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Une vue basée sur les fonctions pour télécharger des fichiers PDF à partir de Google Drive.</span>
+
+<span class="sd">    Cette vue utilise PyDrive pour authentifier et interagir avec Google Drive, puis télécharge les fichiers PDF d&#39;un dossier spécifié.</span>
+
+<span class="sd">    Paramètres :</span>
+<span class="sd">    - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">    - `drive_url` : L&#39;URL du dossier Google Drive à partir duquel télécharger les fichiers.</span>
+
+<span class="sd">    Retours :</span>
+<span class="sd">    - Une réponse HTTP indiquant le succès du téléchargement des fichiers PDF.</span>
+
+<span class="sd">    Méthodes :</span>
+<span class="sd">    - `download_from_drive_view(request, drive_url)` : Gère la requête pour télécharger des fichiers PDF depuis Google Drive.</span>
+
+<span class="sd">    Exemple d&#39;utilisation :</span>
+<span class="sd">    ```python</span>
+<span class="sd">    # Exemple d&#39;utilisation de download_from_drive_view</span>
+<span class="sd">    class SomeView(View):</span>
+<span class="sd">        def some_method(self, request):</span>
+<span class="sd">            # Appel à download_from_drive_view pour télécharger les fichiers PDF</span>
+<span class="sd">            drive_url = &#39;https://drive.google.com/your_folder_url&#39;</span>
+<span class="sd">            download_from_drive_view(request, drive_url)</span>
+
+<span class="sd">            # Traitement de la réponse</span>
+<span class="sd">            # Votre code ici</span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gauth</span> <span class="o">=</span> <span class="n">GoogleAuth</span><span class="p">()</span>
+    <span class="n">gauth</span><span class="o">.</span><span class="n">credentials</span> <span class="o">=</span> <span class="n">ServiceAccountCredentials</span><span class="o">.</span><span class="n">from_json_keyfile_name</span><span class="p">(</span>
+        <span class="s1">&#39;C:/Users/gigabyte/Desktop/TP_IGL/ProjetIGL-Backend/rechrchartc/rchrchArtcl/ServiceAccount.json&#39;</span><span class="p">,</span>
+        <span class="p">[</span><span class="s1">&#39;https://www.googleapis.com/auth/drive&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">drive</span> <span class="o">=</span> <span class="n">GoogleDrive</span><span class="p">(</span><span class="n">gauth</span><span class="p">)</span>
+
+    <span class="n">download_directory</span> <span class="o">=</span> <span class="s1">&#39;C:/Users/gigabyte/Desktop/TP_IGL/ProjetIGL-Backend/rechrchartc/UploadedFiles&#39;</span>
+
+    <span class="c1"># Extract folder ID from the Drive URL</span>
+    <span class="n">url_parts</span> <span class="o">=</span> <span class="n">drive_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="n">folder_id</span> <span class="o">=</span> <span class="n">url_parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Assuming the folder ID is at the end of the URL</span>
+
+    <span class="n">file_list</span> <span class="o">=</span> <span class="n">drive</span><span class="o">.</span><span class="n">ListFile</span><span class="p">({</span><span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">folder_id</span><span class="si">}</span><span class="s2">&#39; in parents and trashed=false&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">GetList</span><span class="p">()</span>
+
+    <span class="c1"># Download only PDF files</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">file_list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pdf&#39;</span><span class="p">):</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">download_directory</span><span class="p">,</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">GetContentFile</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">: File downloaded: </span><span class="si">{</span><span class="n">file</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download: </span><span class="si">{</span><span class="n">file</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s1">&#39;PDF Files downloaded successfully!&#39;</span><span class="p">)</span></div>
+
+    
+<span class="c1"># c&#39;est une fonction pour tester </span>
+<span class="k">def</span> <span class="nf">Test</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># Vous pouvez fournir ici le drive_url à la fonction download_from_drive_view</span>
+    <span class="n">drive_url</span> <span class="o">=</span> <span class="s1">&#39;https://drive.google.com/drive/folders/1kadnheliuIjL6jDajVb06VoenM-E5p0c&#39;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">download_from_drive_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">drive_url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span>
+
+
+<span class="c1"># c&#39;est une fonction pour tester </span>
+<div class="viewcode-block" id="Test">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.Test">[docs]</a>
+<span class="k">def</span> <span class="nf">Test</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># Vous pouvez fournir ici le drive_url à la fonction download_from_drive_view</span>
+    <span class="n">drive_url</span> <span class="o">=</span> <span class="s1">&#39;https://drive.google.com/drive/folders/1kadnheliuIjL6jDajVb06VoenM-E5p0c&#39;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">download_from_drive_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">drive_url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span></div>
+
+
+
+<div class="viewcode-block" id="check_elasticsearch_connection">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.check_elasticsearch_connection">[docs]</a>
+<span class="k">def</span> <span class="nf">check_elasticsearch_connection</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Initialize an Elasticsearch client</span>
+        <span class="n">es</span> <span class="o">=</span> <span class="n">Elasticsearch</span><span class="p">([</span><span class="s1">&#39;http://localhost:9200&#39;</span><span class="p">])</span>  <span class="c1"># Replace with your Elasticsearch server details</span>
+
+        <span class="c1"># Check the connection by pinging the Elasticsearch server</span>
+        <span class="k">if</span> <span class="n">es</span><span class="o">.</span><span class="n">ping</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># Connection successful</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># Ping failed</span>
+    <span class="k">except</span> <span class="ne">ConnectionError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span> </div>
+
+    
+<div class="viewcode-block" id="Test2">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.Test2">[docs]</a>
+<span class="k">def</span> <span class="nf">Test2</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">connected</span> <span class="o">=</span> <span class="n">check_elasticsearch_connection</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">connected</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;Connected to Elasticsearch server.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;Connection to Elasticsearch server failed.&quot;</span><span class="p">)</span></div>
+
+    
+
+<div class="viewcode-block" id="get_article_details">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.get_article_details">[docs]</a>
+<span class="k">def</span> <span class="nf">get_article_details</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Une vue basée sur les fonctions pour récupérer les détails d&#39;un article à partir d&#39;Elasticsearch.</span>
+
+<span class="sd">    Cette vue utilise l&#39;ID de l&#39;article pour interroger Elasticsearch et renvoie les détails de l&#39;article en tant que réponse JSON.</span>
+
+<span class="sd">    Paramètres :</span>
+<span class="sd">    - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">    - `article_id` : L&#39;identifiant de l&#39;article dans Elasticsearch.</span>
+
+<span class="sd">    Retours :</span>
+<span class="sd">    - Une réponse JSON contenant les détails de l&#39;article ou une réponse JSON avec un message d&#39;erreur si l&#39;article n&#39;est pas trouvé.</span>
+
+<span class="sd">    Méthodes :</span>
+<span class="sd">    - `get_article_details(request, article_id)` : Gère la requête pour récupérer les détails d&#39;un article depuis Elasticsearch.</span>
+
+<span class="sd">    Exemple d&#39;utilisation :</span>
+<span class="sd">    ```python</span>
+<span class="sd">    # Exemple d&#39;utilisation de get_article_details</span>
+<span class="sd">    class SomeView(View):</span>
+<span class="sd">        def some_method(self, request):</span>
+<span class="sd">            # Appel à get_article_details pour récupérer les détails de l&#39;article</span>
+<span class="sd">            article_id = &#39;your_article_id&#39;</span>
+<span class="sd">            response = get_article_details(request, article_id)</span>
+
+<span class="sd">         </span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">Elasticsearch</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;http://elastic:8eCLcea63hBwu11_K9mu@localhost:9200&#39;</span><span class="p">])</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Retrieve the article from Elasticsearch using its ID</span>
+        <span class="n">article</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;index1&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">article_id</span><span class="p">)</span> 
+
+        <span class="c1"># Return article details as JSON response</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">article</span><span class="p">[</span><span class="s1">&#39;_source&#39;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="n">NotFoundError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Article not found&#39;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="delete_article">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.delete_article">[docs]</a>
+<span class="k">def</span> <span class="nf">delete_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Une vue basée sur les fonctions pour supprimer un article d&#39;Elasticsearch.</span>
+
+<span class="sd">    Cette vue utilise l&#39;ID de l&#39;article pour supprimer l&#39;article de l&#39;index Elasticsearch.</span>
+
+<span class="sd">    Paramètres :</span>
+<span class="sd">    - `request` : L&#39;objet de requête HTTP Django.</span>
+<span class="sd">    - `article_id` : L&#39;identifiant de l&#39;article dans Elasticsearch.</span>
+
+<span class="sd">    Retours :</span>
+<span class="sd">    - Une réponse JSON indiquant le succès de la suppression de l&#39;article ou une réponse JSON avec un message d&#39;erreur si l&#39;article n&#39;est pas trouvé.</span>
+
+<span class="sd">    Méthodes :</span>
+<span class="sd">    - `delete_article(request, article_id)` : Gère la requête pour supprimer un article depuis Elasticsearch.</span>
+
+<span class="sd">    Exemple d&#39;utilisation :</span>
+<span class="sd">    ```python</span>
+<span class="sd">    # Exemple d&#39;utilisation de delete_article</span>
+<span class="sd">    class SomeView(View):</span>
+<span class="sd">        def some_method(self, request):</span>
+<span class="sd">            # Appel à delete_article pour supprimer l&#39;article</span>
+<span class="sd">            article_id = &#39;your_article_id&#39;</span>
+<span class="sd">            response = delete_article(request, article_id)</span>
+
+<span class="sd">          </span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+   
+    <span class="c1"># Initialize Elasticsearch client with authentication</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">Elasticsearch</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;http://elastic:8eCLcea63hBwu11_K9mu@localhost:9200&#39;</span><span class="p">])</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Delete the article using its ID</span>
+        <span class="n">es</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;index1&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">article_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;Article deleted successfully&#39;</span><span class="p">})</span>
+    <span class="k">except</span> <span class="n">NotFoundError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Article not found&#39;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>        </div>
+
+ 
+
+  
+    
+
+<div class="viewcode-block" id="get_all_articles">
+<a class="viewcode-back" href="../../rchrchArtcl.html#rchrchArtcl.views.get_all_articles">[docs]</a>
+<span class="k">def</span> <span class="nf">get_all_articles</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Une vue basée sur les fonctions pour récupérer tous les articles depuis Elasticsearch.</span>
+
+<span class="sd">    Cette vue utilise une requête Elasticsearch pour rechercher tous les articles dans l&#39;index spécifié et renvoie les données des articles en tant que réponse JSON.</span>
+
+<span class="sd">    Paramètres :</span>
+<span class="sd">    - `request` : L&#39;objet de requête HTTP Django.</span>
+
+<span class="sd">    Retours :</span>
+<span class="sd">    - Une réponse JSON contenant tous les articles ou une réponse JSON avec un message d&#39;erreur en cas d&#39;échec.</span>
+
+<span class="sd">    Méthodes :</span>
+<span class="sd">    - `get_all_articles(request)` : Gère la requête pour récupérer tous les articles depuis Elasticsearch.</span>
+
+<span class="sd">    Exemple d&#39;utilisation :</span>
+<span class="sd">    ```python</span>
+<span class="sd">    # Exemple d&#39;utilisation de get_all_articles</span>
+<span class="sd">    class SomeView(View):</span>
+<span class="sd">        def some_method(self, request):</span>
+<span class="sd">            # Appel à get_all_articles pour récupérer tous les articles</span>
+<span class="sd">            response = get_all_articles(request)</span>
+
+<span class="sd">            # Traitement de la réponse</span>
+<span class="sd">            # Votre code ici</span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>     
+
+        <span class="c1"># Initialize Elasticsearch client with authentication</span>
+        <span class="n">es</span> <span class="o">=</span> <span class="n">Elasticsearch</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;http://elastic:8eCLcea63hBwu11_K9mu@localhost:9200&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Search for all articles in the specified index</span>
+        <span class="n">search_results</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;index1&#39;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;match_all&quot;</span><span class="p">:</span> <span class="p">{}}})</span>
+
+        <span class="c1"># Extract article data from search results</span>
+        <span class="n">articles</span> <span class="o">=</span> <span class="p">[</span><span class="n">hit</span><span class="p">[</span><span class="s1">&#39;_source&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">search_results</span><span class="p">[</span><span class="s1">&#39;hits&#39;</span><span class="p">][</span><span class="s1">&#39;hits&#39;</span><span class="p">]]</span>
+
+        <span class="c1"># Return articles as standardized JSON response</span>
+        <span class="n">response_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;success&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;Articles retrieved successfully&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;articles&#39;</span><span class="p">:</span> <span class="n">articles</span><span class="p">},</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">response_data</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Return error as standardized JSON response</span>
+        <span class="n">error_response</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;success&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;Error retrieving articles&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">error_response</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>    </div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Droits d'auteur 2023, Rahal , megdad , remil , chouider , menassel.</p>
+  </div>
+
+  Compilé avec <a href="https://www.sphinx-doc.org/">Sphinx</a> en utilisant un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">thème</a>
+    fourni par <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
