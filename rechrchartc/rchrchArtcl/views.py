@@ -1,22 +1,17 @@
-import termios
 from rest_framework.views import APIView 
 from .api.serializers import *
 from rest_framework.response import Response 
 
 from .models import *
-
-import jwt , datetime  
+ 
 from oauth2client.service_account import ServiceAccountCredentials
 
 from rest_framework import status
-from .api import serializers
-
-from . import models
 
 import PyPDF2
 from django.db import connections
 from django.http import JsonResponse
-from elasticsearch_dsl import Q, Date, Document, Search,Term ,Text,Range
+from elasticsearch_dsl import Q, Date, Document, Search,Text,Range
 
 from django.shortcuts import HttpResponse
 from django.test import TestCase, Client
@@ -758,6 +753,15 @@ class ArticleFavoris(APIView):
         return Response({"status":"success","data":"item Deleted" })  
     
 
+class ArticleGet(APIView):
+    def get(self,request,pk):
+        article = Article.objects.get(id=pk)
+        serializer = ArticleSerializer(article,many=False)
+        return Response(serializer.data)
+    
+
+    
+
 
 class ArticleViewset(APIView):
     """
@@ -868,14 +872,12 @@ class ArticleViewset(APIView):
         """
         Gère la requête GET pour récupérer tous les articles.
 
-        Paramètres :
-        - `request` : L'objet de requête HTTP Django.
-
-        Retours :
-        - Une réponse JSON contenant la liste de tous les articles.
         """
-        articales =   Article.objects.all() 
-        return Response(articales)
+        articles = Article.objects.all()
+        serializer = ArticleSerializer(articles,many=True)
+
+
+        return Response(serializer.data)
     
 
 
